@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>بأسمائه نحيا - الصفحة الرئيسية</title>
+  <meta name="description" content="الصفحة الرئيسية لأجزاء كتاب بأسمائه نحيا. اختر أي جزء للدخول إليه مباشرة، مع حفظ قراءة مستقل لكل جزء.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f1ea;
+      --surface: rgba(255, 250, 244, 0.88);
+      --surface-strong: #ffffff;
+      --text: #22150c;
+      --muted: #6d5b50;
+      --accent: #8e4218;
+      --accent-soft: #d8b59a;
+      --border: rgba(142, 66, 24, 0.14);
+      --shadow: 0 18px 40px rgba(49, 27, 16, 0.08);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top right, rgba(216, 181, 154, 0.2), transparent 25%),
+        linear-gradient(180deg, #fbf7f1 0%, #f3ece3 100%);
+      color: var(--text);
+      font-family: "Amiri", serif;
+    }
+
+    body {
+      padding: 18px;
+    }
+
+    .page {
+      max-width: 1320px;
+      margin: 0 auto;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      padding: 28px 24px 18px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,0.56), rgba(255,255,255,0.18));
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--accent);
+      font-family: "Cairo", sans-serif;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2.15rem;
+      line-height: 1.3;
+    }
+
+    .intro {
+      margin: 10px 0 0;
+      max-width: 900px;
+      color: var(--muted);
+      font-size: 1.03rem;
+      line-height: 1.95;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      padding: 22px;
+    }
+
+    .card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      background: var(--surface-strong);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 8px 24px rgba(61, 34, 17, 0.05);
+      transition: 0.22s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(142, 66, 24, 0.28);
+      box-shadow: 0 16px 34px rgba(61, 34, 17, 0.1);
+    }
+
+    .card-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-family: "Cairo", sans-serif;
+      font-size: 0.86rem;
+      font-weight: 700;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+      line-height: 1.5;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.85;
+      font-size: 0.98rem;
+    }
+
+    .footnote {
+      padding: 0 22px 22px;
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 0.96rem;
+    }
+
+    .footnote strong {
+      color: var(--accent);
+    }
+
+    @media (max-width: 1080px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 10px;
+      }
+
+      .hero {
+        padding: 22px 16px 16px;
+      }
+
+      h1 {
+        font-size: 1.72rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+
+      .footnote {
+        padding: 0 16px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <p class="eyebrow">الصفحة الرئيسية</p>
+      <h1>بأسمائه نحيا</h1>
+      <p class="intro">
+        اختر أي جزء للدخول إليه مباشرة كصفحة كاملة مستقلة. كل جزء يحتفظ بموضع
+        القراءة الخاص به بشكل منفصل، لذلك يمكنك التنقل بين الأجزاء والعودة لاحقًا
+        لتجد كل جزء عند آخر موضع توقفت عنده.
+      </p>
+    </header>
+
+    <section class="grid" aria-label="أجزاء الكتاب">
+      <a class="card" href="index-v2-part1.html">
+        <span class="card-kicker">الجزء الأول</span>
+        <h2>أسماء الجمال والرحمة والغفران</h2>
+        <p>الدخول إلى الجزء الأول بواجهة القراءة الكاملة.</p>
+      </a>
+
+      <a class="card" href="index-v2-part2.html">
+        <span class="card-kicker">الجزء الثاني</span>
+        <h2>الجزء الثاني</h2>
+        <p>الدخول إلى الجزء الثاني بواجهة القراءة الكاملة.</p>
+      </a>
+
+      <a class="card" href="index-v2-part3.html">
+        <span class="card-kicker">الجزء الثالث</span>
+        <h2>الجزء الثالث</h2>
+        <p>الدخول إلى الجزء الثالث بواجهة القراءة الكاملة.</p>
+      </a>
+
+      <a class="card" href="index-v2-part4.html">
+        <span class="card-kicker">الجزء الرابع</span>
+        <h2>الجزء الرابع</h2>
+        <p>الدخول إلى الجزء الرابع بواجهة القراءة الكاملة.</p>
+      </a>
+
+      <a class="card" href="index-v2-part5.html">
+        <span class="card-kicker">الجزء الخامس</span>
+        <h2>الجزء الخامس</h2>
+        <p>الدخول إلى الجزء الخامس بواجهة القراءة الكاملة.</p>
+      </a>
+
+      <a class="card" href="index-v2-part6.html">
+        <span class="card-kicker">الجزء السادس</span>
+        <h2>الجزء السادس</h2>
+        <p>الدخول إلى الجزء السادس بواجهة القراءة الكاملة.</p>
+      </a>
+
+      <a class="card" href="index-v2-part7.html">
+        <span class="card-kicker">الجزء السابع</span>
+        <h2>الجزء السابع</h2>
+        <p>الدخول إلى الجزء السابع بواجهة القراءة الكاملة.</p>
+      </a>
+    </section>
+
+    <div class="footnote">
+      <strong>مهم:</strong>
+      كل جزء يعمل كموقع قراءة مستقل، ويحتفظ بحفظه التلقائي الخاص به دون التأثير
+      على بقية الأجزاء.
+    </div>
+  </main>
+</body>
+</html>
