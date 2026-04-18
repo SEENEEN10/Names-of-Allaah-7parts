@@ -1082,7 +1082,7 @@
         { id: 'chapter-full', title: 'النص الكامل للكتاب' }
       ];
       const CHAPTER_SOURCES = {
-        'chapter-full': 'chapters/part4-full.html'
+        'chapter-full': { mode: 'chunked', base: 'chapters/part4', count: 51 }
       };
 
       const STORAGE_PREFIX = 'asma_p4_v2_';
@@ -1101,7 +1101,10 @@
         lastScrollY: 0,
         readingBlocks: [],
         tocEntries: [],
-        chapterHtmlCache: {}
+        chapterHtmlCache: {},
+        loadedChunkIndex: 0,
+        chunkSource: null,
+        loadingChunk: false
       };
 
       const dom = {
@@ -1417,34 +1420,91 @@
         });
       }
 
-      async function getInlineChapterHtml(chapterId) {
-        if (state.chapterHtmlCache[chapterId]) {
-          return state.chapterHtmlCache[chapterId];
+      async function fetchChunkHtml(source, chunkIndex) {
+        const key = `${source.base}/chunk-${String(chunkIndex).padStart(3, '0')}.html`;
+        if (state.chapterHtmlCache[key]) {
+          return state.chapterHtmlCache[key];
         }
+        const response = await fetch(key, { cache: 'force-cache' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const html = (await response.text()).trim();
+        state.chapterHtmlCache[key] = html;
+        return html;
+      }
+
+      async function getInlineChapterHtml(chapterId) {
+        const source = CHAPTER_SOURCES[chapterId];
 
         const template = document.getElementById(`chapter-template-${chapterId}`);
         if (template) {
           const html = template.innerHTML.trim();
-          state.chapterHtmlCache[chapterId] = html;
-          return html;
+          return { html, chunked: false };
         }
 
-        const source = CHAPTER_SOURCES[chapterId];
         if (!source) {
-          return '';
+          return { html: '', chunked: false };
         }
 
-        try {
+        if (typeof source === 'string') {
+          if (state.chapterHtmlCache[source]) {
+            return { html: state.chapterHtmlCache[source], chunked: false };
+          }
           const response = await fetch(source, { cache: 'force-cache' });
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
           }
           const html = (await response.text()).trim();
-          state.chapterHtmlCache[chapterId] = html;
-          return html;
+          state.chapterHtmlCache[source] = html;
+          return { html, chunked: false };
+        }
+
+        if (source.mode === 'chunked') {
+          state.chunkSource = source;
+          state.loadedChunkIndex = 1;
+          const firstChunk = await fetchChunkHtml(source, 1);
+          return { html: firstChunk, chunked: true };
+        }
+
+        return { html: '', chunked: false };
+      }
+
+      async function appendNextChunkIfNeeded() {
+        if (!state.chunkSource || state.loadingChunk) {
+          return;
+        }
+        if (state.loadedChunkIndex >= state.chunkSource.count) {
+          return;
+        }
+
+        const nearBottom = window.scrollY + window.innerHeight + 900 >= document.documentElement.scrollHeight;
+        if (!nearBottom) {
+          return;
+        }
+
+        state.loadingChunk = true;
+        try {
+          const nextIndex = state.loadedChunkIndex + 1;
+          const nextHtml = await fetchChunkHtml(state.chunkSource, nextIndex);
+          if (nextHtml) {
+            const section = document.createElement('section');
+            section.innerHTML = nextHtml;
+            dom.content.appendChild(section);
+            optimizeContentImages();
+            requestAnimationFrame(() => {
+              normalizeFullChapterLayout();
+              decorateQuranContent();
+              buildInlineContentsList();
+              indexReadingBlocks();
+              updateProgressBar();
+            });
+            state.loadedChunkIndex = nextIndex;
+          }
         } catch (error) {
-          console.error('Failed to fetch chapter source:', source, error);
-          return '';
+          console.error('Failed to append next chunk:', error);
+        } finally {
+          state.loadingChunk = false;
         }
       }
 
@@ -1694,7 +1754,10 @@
         markActiveChapter(chapterId);
 
         dom.content.innerHTML = '<div class="placeholder"><p>جاري تحميل الفصل...</p></div>';
-        const chapterHtml = await getInlineChapterHtml(chapterId);
+        state.chunkSource = null;
+        state.loadedChunkIndex = 0;
+        const chapterData = await getInlineChapterHtml(chapterId);
+        const chapterHtml = chapterData.html;
         if (!chapterHtml) {
           dom.content.innerHTML = `
             <div class="error">
@@ -1722,6 +1785,54 @@
           dom.topbar.classList.remove('is-hidden');
         }
         restoreSavedPosition(chapterId);
+
+        if (chapterData.chunked) {
+          const backgroundAppend = async () => {
+            if (!state.chunkSource) return;
+            const save = storageGet(`pos_${state.currentChapter}`, null);
+            if (save && typeof save === 'object' && typeof save.y === 'number') {
+              while (state.loadedChunkIndex < state.chunkSource.count && document.documentElement.scrollHeight < (save.y + 1200)) {
+                await appendNextChunkIfNeeded();
+                // force condition true for recovery loads
+                if (!state.loadingChunk) {
+                  const nextIndex = state.loadedChunkIndex + 1;
+                  if (nextIndex <= state.chunkSource.count) {
+                    state.loadingChunk = true;
+                    try {
+                      const nextHtml = await fetchChunkHtml(state.chunkSource, nextIndex);
+                      if (nextHtml) {
+                        const section = document.createElement('section');
+                        section.innerHTML = nextHtml;
+                        dom.content.appendChild(section);
+                        optimizeContentImages();
+                        state.loadedChunkIndex = nextIndex;
+                      }
+                    } finally {
+                      state.loadingChunk = false;
+                    }
+                  }
+                }
+              }
+              requestAnimationFrame(() => {
+                normalizeFullChapterLayout();
+                decorateQuranContent();
+                buildInlineContentsList();
+                indexReadingBlocks();
+                restoreSavedPosition(chapterId);
+                updateProgressBar();
+              });
+            }
+
+            const idleLoad = async () => {
+              if (!state.chunkSource) return;
+              if (state.loadedChunkIndex >= state.chunkSource.count) return;
+              await appendNextChunkIfNeeded();
+              setTimeout(idleLoad, 120);
+            };
+            setTimeout(idleLoad, 500);
+          };
+          setTimeout(backgroundAppend, 350);
+        }
       }
 
       function findDedicationPosition() {
