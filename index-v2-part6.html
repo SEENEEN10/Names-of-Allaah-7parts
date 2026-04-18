@@ -1104,7 +1104,10 @@
         chapterHtmlCache: {},
         loadedChunkIndex: 0,
         chunkSource: null,
-        loadingChunk: false
+        loadingChunk: false,
+        chunkTocCache: {},
+        chunkTocPromise: null,
+        chunkTocChapter: null
       };
 
       const dom = {
@@ -1215,7 +1218,7 @@
           return `<li><a href="#${chapter.id}" class="chapter-link" data-chapter="${chapter.id}">${index + 1}. ${chapter.title}</a></li>`;
         }).join('');
 
-        dom.chaptersList.addEventListener('click', (event) => {
+        dom.chaptersList.addEventListener('click', async (event) => {
           const link = event.target.closest('.chapter-link');
           if (!link) {
             return;
@@ -1225,7 +1228,11 @@
 
           const targetSelector = link.dataset.target;
           if (targetSelector && state.currentChapter === 'chapter-full') {
-            const target = resolveContentTarget(targetSelector);
+            let target = resolveContentTarget(targetSelector);
+            if (!target) {
+              await ensureTargetLoaded(targetSelector);
+              target = resolveContentTarget(targetSelector);
+            }
             if (target) {
               target.scrollIntoView({ behavior: 'smooth', block: 'start' });
               setTimeout(() => {
@@ -1238,7 +1245,7 @@
             }
           }
 
-          loadChapter(link.dataset.chapter);
+          await loadChapter(link.dataset.chapter);
           closePanels();
         });
       }
@@ -1271,55 +1278,7 @@
         return dom.content.querySelector(targetSelector);
       }
 
-      function buildInlineContentsList() {
-        if (!dom.chaptersList) {
-          return;
-        }
-
-        state.tocEntries = [];
-        const items = [];
-        const seen = new Set();
-        const addItem = (title, selector, level = 1) => {
-          const cleanTitle = (title || '').replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
-          if (!cleanTitle || cleanTitle.length < 2 || seen.has(selector)) {
-            return;
-          }
-          seen.add(selector);
-          items.push({ title: cleanTitle, selector, level });
-        };
-
-        const dedicationHeading = Array.from(dom.content.querySelectorAll('p, h1, h2, h3'))
-          .find((el) => (el.textContent || '').includes('الإهداء'));
-        if (dedicationHeading) {
-          if (!dedicationHeading.id) {
-            dedicationHeading.id = 'section-dedication';
-          }
-          addItem('الإهداء', `#${dedicationHeading.id}`, 1);
-        }
-
-        const tocLinks = Array.from(dom.content.querySelectorAll('.MsoToc1 a[href^="#"], .MsoToc2 a[href^="#"]'));
-        tocLinks.forEach((link) => {
-          const href = link.getAttribute('href');
-          if (!href) {
-            return;
-          }
-          const level = link.closest('.MsoToc2') ? 2 : 1;
-          addItem(link.textContent, href, level);
-        });
-
-        if (!items.length) {
-          Array.from(dom.content.querySelectorAll('h2, h3')).forEach((heading) => {
-            const title = (heading.textContent || '').trim();
-            if (!title) {
-              return;
-            }
-            if (!heading.id) {
-              heading.id = `section-${slugifyArabic(title) || Math.random().toString(36).slice(2, 8)}`;
-            }
-            addItem(title, `#${heading.id}`, heading.tagName === 'H3' ? 2 : 1);
-          });
-        }
-
+      function renderInlineContentsList(items) {
         if (!items.length) {
           return;
         }
@@ -1336,9 +1295,150 @@
           link,
           selector: link.dataset.target,
           target: resolveContentTarget(link.dataset.target)
-        })).filter((entry) => entry.target);
+        }));
 
         updateActiveContentsEntry();
+      }
+
+      function extractTocItemsFromContainer(container) {
+        const items = [];
+        const seen = new Set();
+        const addItem = (title, selector, level = 1) => {
+          const cleanTitle = (title || '').replace(/ /g, ' ').replace(/\s+/g, ' ').trim();
+          if (!cleanTitle || cleanTitle.length < 2 || !selector || seen.has(selector)) {
+            return;
+          }
+          seen.add(selector);
+          items.push({ title: cleanTitle, selector, level });
+        };
+
+        const dedicationHeading = Array.from(container.querySelectorAll('p, h1, h2, h3'))
+          .find((el) => (el.textContent || '').includes('الإهداء'));
+        if (dedicationHeading) {
+          if (!dedicationHeading.id) {
+            dedicationHeading.id = 'section-dedication';
+          }
+          addItem('الإهداء', `#${dedicationHeading.id}`, 1);
+        }
+
+        const tocLinks = Array.from(container.querySelectorAll('.MsoToc1 a[href^="#"], .MsoToc2 a[href^="#"]'));
+        tocLinks.forEach((link) => {
+          const href = link.getAttribute('href');
+          if (!href) {
+            return;
+          }
+          const level = link.closest('.MsoToc2') ? 2 : 1;
+          addItem(link.textContent, href, level);
+        });
+
+        if (!items.length) {
+          Array.from(container.querySelectorAll('h2, h3')).forEach((heading) => {
+            const title = (heading.textContent || '').trim();
+            if (!title) {
+              return;
+            }
+            if (!heading.id) {
+              heading.id = `section-${slugifyArabic(title) || Math.random().toString(36).slice(2, 8)}`;
+            }
+            addItem(title, `#${heading.id}`, heading.tagName === 'H3' ? 2 : 1);
+          });
+        }
+
+        return items;
+      }
+
+      async function loadInlineContentsFromChunkSource(chapterId, source) {
+        const cached = state.chunkTocCache[chapterId];
+        if (cached && cached.length) {
+          return cached;
+        }
+
+        let collecting = false;
+        let idleAfterCollect = 0;
+        const collected = [];
+        const seen = new Set();
+
+        for (let i = 1; i <= source.count; i += 1) {
+          const chunkHtml = await fetchChunkHtml(source, i);
+          if (!chunkHtml) {
+            continue;
+          }
+
+          const hasTocMarker = /MsoToc[12]|href\s*=\s*["']#_Toc/i.test(chunkHtml);
+          if (!collecting && !hasTocMarker) {
+            continue;
+          }
+
+          collecting = true;
+          const probe = document.createElement('div');
+          probe.innerHTML = chunkHtml;
+          const chunkItems = extractTocItemsFromContainer(probe);
+
+          if (chunkItems.length) {
+            idleAfterCollect = 0;
+            chunkItems.forEach((item) => {
+              if (seen.has(item.selector)) {
+                return;
+              }
+              seen.add(item.selector);
+              collected.push(item);
+            });
+          } else {
+            idleAfterCollect += 1;
+            if (idleAfterCollect >= 2) {
+              break;
+            }
+          }
+        }
+
+        state.chunkTocCache[chapterId] = collected;
+        return collected;
+      }
+
+      function buildInlineContentsList() {
+        if (!dom.chaptersList) {
+          return;
+        }
+
+        state.tocEntries = [];
+        const items = extractTocItemsFromContainer(dom.content);
+
+        if (items.length) {
+          renderInlineContentsList(items);
+          return;
+        }
+
+        if (!state.chunkSource || state.currentChapter !== 'chapter-full') {
+          return;
+        }
+
+        const chapterId = state.currentChapter;
+        const cached = state.chunkTocCache[chapterId];
+        if (cached && cached.length) {
+          renderInlineContentsList(cached);
+          return;
+        }
+
+        if (state.chunkTocPromise && state.chunkTocChapter === chapterId) {
+          return;
+        }
+
+        state.chunkTocChapter = chapterId;
+        state.chunkTocPromise = loadInlineContentsFromChunkSource(chapterId, state.chunkSource)
+          .then((loadedItems) => {
+            if (state.currentChapter !== chapterId || !loadedItems || !loadedItems.length) {
+              return;
+            }
+            renderInlineContentsList(loadedItems);
+          })
+          .catch((error) => {
+            console.error('Failed to build TOC from chunk source:', error);
+          })
+          .finally(() => {
+            if (state.chunkTocChapter === chapterId) {
+              state.chunkTocPromise = null;
+            }
+          });
       }
 
       function indexReadingBlocks() {
@@ -1470,17 +1570,17 @@
         return { html: '', chunked: false };
       }
 
-      async function appendNextChunkIfNeeded() {
+      async function appendNextChunk(force = false) {
         if (!state.chunkSource || state.loadingChunk) {
-          return;
+          return false;
         }
         if (state.loadedChunkIndex >= state.chunkSource.count) {
-          return;
+          return false;
         }
 
         const nearBottom = window.scrollY + window.innerHeight + 900 >= document.documentElement.scrollHeight;
-        if (!nearBottom) {
-          return;
+        if (!force && !nearBottom) {
+          return false;
         }
 
         state.loadingChunk = true;
@@ -1500,12 +1600,35 @@
               updateProgressBar();
             });
             state.loadedChunkIndex = nextIndex;
+            return true;
           }
+          return false;
         } catch (error) {
           console.error('Failed to append next chunk:', error);
+          return false;
         } finally {
           state.loadingChunk = false;
         }
+      }
+
+      async function appendNextChunkIfNeeded() {
+        return appendNextChunk(false);
+      }
+
+      async function ensureTargetLoaded(targetSelector) {
+        if (!state.chunkSource || !targetSelector) {
+          return null;
+        }
+
+        let target = resolveContentTarget(targetSelector);
+        while (!target && state.loadedChunkIndex < state.chunkSource.count) {
+          const appended = await appendNextChunk(true);
+          if (!appended) {
+            break;
+          }
+          target = resolveContentTarget(targetSelector);
+        }
+        return target;
       }
 
       function normalizeFullChapterLayout() {
@@ -1756,6 +1879,8 @@
         dom.content.innerHTML = '<div class="placeholder"><p>جاري تحميل الفصل...</p></div>';
         state.chunkSource = null;
         state.loadedChunkIndex = 0;
+        state.chunkTocPromise = null;
+        state.chunkTocChapter = null;
         const chapterData = await getInlineChapterHtml(chapterId);
         const chapterHtml = chapterData.html;
         if (!chapterHtml) {
@@ -1792,7 +1917,7 @@
             const save = storageGet(`pos_${state.currentChapter}`, null);
             if (save && typeof save === 'object' && typeof save.y === 'number') {
               while (state.loadedChunkIndex < state.chunkSource.count && document.documentElement.scrollHeight < (save.y + 1200)) {
-                await appendNextChunkIfNeeded();
+                await appendNextChunk(true);
                 // force condition true for recovery loads
                 if (!state.loadingChunk) {
                   const nextIndex = state.loadedChunkIndex + 1;
@@ -1826,7 +1951,7 @@
             const idleLoad = async () => {
               if (!state.chunkSource) return;
               if (state.loadedChunkIndex >= state.chunkSource.count) return;
-              await appendNextChunkIfNeeded();
+              await appendNextChunk(true);
               setTimeout(idleLoad, 120);
             };
             setTimeout(idleLoad, 500);
