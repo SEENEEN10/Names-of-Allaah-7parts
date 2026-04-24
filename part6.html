@@ -678,11 +678,25 @@ function fixImages(root) {
 
 function fixLayout() {
   const c = D.content;
+
+  /* 1. Convert absolute-positioned Word artifacts to relative */
   c.querySelectorAll('[style*="position:absolute"],[style*="position: absolute"]').forEach(el => {
     el.style.position = 'relative';
     el.style.left = '';
     el.style.top  = '';
+    el.style.zIndex = '';        /* clear massive Word z-index values */
+    el.style.marginTop = '';
+    el.style.marginLeft = '';
   });
+
+  /* 2. Zero out any remaining huge z-index values (z > 100 is a Word artifact).
+        These create invisible overlays that block clicks on the topbar/buttons. */
+  c.querySelectorAll('[style*="z-index"]').forEach(el => {
+    const zi = parseInt(el.style.zIndex, 10);
+    if (!isNaN(zi) && zi > 100) el.style.zIndex = '';
+  });
+
+  /* 3. Fix white-text-on-white-background from Word tables */
   c.querySelectorAll('[style]').forEach(el => {
     const s = el.style;
     const col = s.color;
@@ -694,6 +708,8 @@ function fixLayout() {
       if (!hasDarkBg) s.color = '';
     }
   });
+
+  /* 4. Wrap tables for horizontal scroll */
   c.querySelectorAll('table').forEach(tbl => {
     if (tbl.parentElement && tbl.parentElement.classList.contains('tbl-wrap')) return;
     const wrap = document.createElement('div');
