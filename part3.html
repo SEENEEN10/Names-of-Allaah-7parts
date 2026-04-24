@@ -508,34 +508,32 @@ function initFeedback() {
   const status = document.getElementById('fb-status');
   if (!form) return;
 
-  form.addEventListener('submit', async e => {
+  /* Email assembled in JS — never appears as plain text in HTML source */
+  const _u = ['m','a','f','.','b','d','c'].join('');
+  const _d = ['g','m','a','i','l','.','c','o','m'].join('');
+  const _e = _u + '@' + _d;
+
+  form.addEventListener('submit', e => {
     e.preventDefault();
-    const msg = document.getElementById('fb-msg').value.trim();
-    if (!msg) { status.style.color='var(--accent)'; status.textContent='يُرجى كتابة ملاحظتك أولاً.'; return; }
-
-    const btn = form.querySelector('[type=submit]');
-    btn.disabled = true;
-    status.style.color = 'var(--muted)';
-    status.textContent = 'جارٍ الإرسال…';
-
-    try {
-      const data = new FormData(form);
-      const res  = await fetch('https://formspree.io/f/xvgoeqzj', {
-        method: 'POST', body: data, headers: { Accept: 'application/json' }
-      });
-      if (res.ok) {
-        status.style.color = '#2e7d32';
-        status.textContent = 'شكراً! وصلت ملاحظتك بنجاح ✓';
-        form.reset();
-      } else {
-        throw new Error('server');
-      }
-    } catch(_) {
+    const name = (document.getElementById('fb-name').value || '').trim();
+    const msg  = document.getElementById('fb-msg').value.trim();
+    if (!msg) {
       status.style.color = 'var(--accent)';
-      status.textContent = 'حدث خطأ. يُرجى المحاولة مرة أخرى.';
-    } finally {
-      btn.disabled = false;
+      status.textContent = 'يُرجى كتابة ملاحظتك أولاً.';
+      return;
     }
+
+    const bodyParts = [];
+    if (name) bodyParts.push('الاسم: ' + name + '\n');
+    bodyParts.push('الملاحظة:\n' + msg);
+
+    const subject  = encodeURIComponent('ملاحظة — بأسمائه نحيا');
+    const body     = encodeURIComponent(bodyParts.join('\n'));
+    window.location.href = 'mailto:' + _e + '?subject=' + subject + '&body=' + body;
+
+    status.style.color   = '#2e7d32';
+    status.textContent   = 'شكراً! سيفتح تطبيق البريد لإرسال ملاحظتك ✓';
+    form.reset();
   });
 }
 
