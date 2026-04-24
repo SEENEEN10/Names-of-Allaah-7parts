@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بأسمائه نحيا — الجزء 5</title>
+  <meta name="description" content="قارئ كتاب بأسمائه نحيا — فقه الحب والتقوى في الأسماء الحسنى">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    /* Uthmanic font for Quran verses */
+    @font-face {
+      font-family: "Uthmanic";
+      src: url("assets/uthmanic-hafs.otf") format("opentype");
+      font-display: swap;
+    }
+
+    :root {
+      --bg:      #f8f4ef;
+      --surface: #ffffff;
+      --text:    #1c1007;
+      --muted:   #6b5d4f;
+      --accent:  #8b3a12;
+      --accent2: #d4a574;
+      --border:  #e8dfd6;
+      --shadow:  0 6px 22px rgba(0,0,0,.07);
+      --radius:  14px;
+      --font:    Georgia,"Times New Roman",serif;
+      --font-ui: system-ui,sans-serif;
+      --size:    18px;
+      --lh:      2;
+      --panel-w: 300px;
+    }
+    body.dark  { --bg:#111317; --surface:#1a1f27; --text:#f0e5d8; --muted:#baa58f; --accent:#e2a05f; --accent2:#be7f40; --border:#2d3440; --shadow:0 8px 28px rgba(0,0,0,.38); }
+    body.sepia { --bg:#f0e7d8; --surface:#fbf4e6; --text:#3d2a18; --muted:#6d553f; --accent:#915c2e; --accent2:#bb8a58; --border:#dfd0bc; }
+    body.sand  { --bg:#ede2bd; --surface:#fbf6df; --text:#332b1f; --muted:#6f5e45; --accent:#8a6d42; --accent2:#af8f60; --border:#d8c49a; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: var(--size);
+      line-height: var(--lh);
+      overflow-x: hidden;
+      transition: background .2s, color .2s;
+    }
+
+    /* ── PROGRESS BAR ─────────────────────────────────────────────────── */
+    #prog-track {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 3px; z-index: 600; pointer-events: none;
+    }
+    #prog-fill {
+      height: 100%; width: 0;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      transition: width .1s linear;
+    }
+
+    /* ── TOPBAR — sticky, auto-hides on scroll-down ───────────────────── */
+    #topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: .6rem; flex-wrap: wrap;
+      padding: .7rem 1.2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      transition: transform .26s ease, background .2s, border-color .2s;
+    }
+    #topbar.hidden { transform: translateY(calc(-100% - 3px)); }
+
+    .brand { display: flex; flex-direction: column; line-height: 1.2; }
+    .brand-title { color: var(--accent); font-size: 1.18rem; font-weight: 700; }
+    .brand-sub   { color: var(--muted); font-family: var(--font-ui); font-size: .73rem; }
+
+    .ctrl-row { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: .46rem .82rem; min-height: 42px;
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--surface); color: var(--text);
+      font-family: var(--font-ui); font-size: .86rem;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+      transition: border-color .18s, box-shadow .18s;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover { border-color: var(--accent2); box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border-color: transparent; color: #fff;
+    }
+    .btn.primary:hover { opacity: .91; }
+
+    /* ── READING AREA ─────────────────────────────────────────────────── */
+    #wrap { max-width: 900px; margin: 0 auto; padding: 1.4rem 1rem 4rem; }
+
+    #content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      min-height: 60vh;
+      transition: background .2s, border-color .2s;
+    }
+
+    /* ── WORD/MSO NORMALISATION ───────────────────────────────────────── */
+    #content section + section {
+      border-top: 1px solid var(--border);
+      padding-top: 2rem; margin-top: 2rem;
+    }
+    #content p,
+    #content div,
+    #content h1,#content h2,#content h3,
+    #content h4,#content h5,#content h6,
+    #content ul,#content ol {
+      width: auto     !important;
+      max-width: 100% !important;
+      margin-left: 0  !important;
+      margin-right: 0 !important;
+    }
+    #content p {
+      line-height: var(--lh) !important;
+      margin-bottom: 1rem;
+      text-align: justify;
+      text-indent: 0 !important;
+      overflow-wrap: anywhere;
+    }
+    #content h1 { color: var(--accent); font-size: 1.55rem; margin: 1.3rem 0 .75rem; }
+    #content h2 { color: var(--accent); font-size: 1.22rem; margin: 1.1rem 0 .6rem; }
+    #content h3 { color: var(--accent); font-size: 1.05rem; margin: .9rem 0 .5rem; }
+    #content ul,#content ol { list-style-position: inside !important; padding-right: 1rem !important; margin-bottom: 1rem; }
+    #content li { margin-bottom: .35rem; text-indent: 0 !important; overflow-wrap: anywhere; }
+    #content blockquote { border-right: 3px solid var(--accent2); padding-right: 1rem; margin: 1rem 0; color: var(--muted); }
+    #content .MsoToc1,#content .MsoToc2 { width: auto !important; max-width: 100% !important; padding-right: .75rem !important; text-indent: 0 !important; white-space: normal !important; overflow-wrap: anywhere !important; tab-size: 0 !important; }
+    #content img    { max-width: 100% !important; height: auto !important; }
+    /* Tables: keep display:table so cell backgrounds/colours render correctly.
+       Horizontal scrolling is handled by .tbl-wrap added by fixLayout(). */
+    .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+    #content table  { max-width: 100% !important; border-collapse: collapse; }
+    #content .quran-quote,
+    #content .quran-quote * { font-family: "Uthmanic","Noto Naskh Arabic",Georgia,serif !important; letter-spacing: 0 !important; word-spacing: .04em; }
+
+    /* ── STATUS / LOADER ──────────────────────────────────────────────── */
+    .msg { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .msg h2 { color: var(--accent); margin-bottom: .6rem; }
+    .msg p  { font-family: var(--font-ui); font-size: .92rem; }
+
+    #load-bar-wrap {
+      display: none;
+      margin-bottom: 1rem;
+      font-family: var(--font-ui); font-size: .82rem;
+      color: var(--muted);
+    }
+    #load-bar-wrap.show { display: block; }
+    #load-bar-bg {
+      height: 4px; background: var(--border); border-radius: 2px;
+      overflow: hidden; margin-top: .4rem;
+    }
+    #load-bar-fill {
+      height: 100%; width: 0; background: var(--accent2); border-radius: 2px;
+      transition: width .18s ease;
+    }
+    #load-spinner { text-align: center; padding: 1rem; font-family: var(--font-ui); font-size: .82rem; color: var(--muted); }
+
+    /* ── PANELS ───────────────────────────────────────────────────────── */
+    .panel {
+      position: fixed; top: 0; height: 100vh; height: 100dvh;
+      width: var(--panel-w); overflow-y: auto;
+      overscroll-behavior: contain;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: var(--shadow); z-index: 200; padding: 1rem;
+      transition: transform .24s ease, background .2s, border-color .2s;
+    }
+    #names-panel    { right: 0; transform: translateX(110%); }
+    #settings-panel { left: 0;  transform: translateX(-110%); }
+    .panel.open     { transform: translateX(0); }
+
+    .panel h3 { color: var(--accent); font-size: 1.05rem; margin-bottom: .9rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border); }
+
+    .panel-close { float: left; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--muted); padding: .2rem .4rem; }
+    #settings-panel .panel-close { float: right; }
+
+    /* Names list inside panel — flat, no categories */
+    .name-btn {
+      display: block; width: 100%; text-align: right;
+      padding: .55rem .75rem; margin-bottom: .3rem;
+      background: none; border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: var(--font); font-size: .96rem;
+      cursor: pointer; min-height: 42px; touch-action: manipulation;
+      transition: background .14s, border-color .14s, color .14s;
+    }
+    .name-btn:hover, .name-btn.active {
+      background: color-mix(in srgb, var(--accent) 9%, transparent);
+      border-color: var(--accent2); color: var(--accent);
+    }
+    .name-btn small { display: block; font-family: var(--font-ui); font-size: .68rem; color: var(--muted); margin-top: .1rem; }
+
+    /* ── SETTINGS ─────────────────────────────────────────────────────── */
+    .s-row { margin-bottom: 1.1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .s-row:last-child { border-bottom: none; }
+    .s-label { display: block; font-family: var(--font-ui); font-size: .84rem; color: var(--muted); margin-bottom: .42rem; }
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+    .th-btn { padding: .5rem .3rem; border: 2px solid transparent; border-radius: 8px; cursor: pointer; font-family: var(--font-ui); font-size: .82rem; text-align: center; min-height: 40px; touch-action: manipulation; transition: border-color .15s, transform .15s; }
+    .th-btn.active { border-color: var(--accent); transform: translateY(-1px); }
+    .th-btn[data-t="light"] { background:#f8f4ef; color:#1c1007; }
+    .th-btn[data-t="dark"]  { background:#1a1f27; color:#f0e5d8; }
+    .th-btn[data-t="sepia"] { background:#f0e7d8; color:#3d2a18; }
+    .th-btn[data-t="sand"]  { background:#ede2bd; color:#332b1f; }
+    select { width: 100%; padding: .48rem .6rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-family: var(--font-ui); font-size: .9rem; }
+    .num-row { display: flex; align-items: center; gap: .5rem; }
+    .num-val  { min-width: 48px; text-align: center; font-family: var(--font-ui); color: var(--muted); font-size: .84rem; }
+    .num-btn  { flex-shrink: 0; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+    input[type="range"] { width: 100%; }
+
+    /* ── OVERLAY ──────────────────────────────────────────────────────── */
+    #overlay { position: fixed; inset: 0; z-index: 190; background: rgba(0,0,0,.26); opacity: 0; pointer-events: none; transition: opacity .24s; }
+    #overlay.show { opacity: 1; pointer-events: auto; }
+
+    /* ── AUTOSAVE TOAST ───────────────────────────────────────────────── */
+    #save-ind { position: fixed; bottom: 1rem; left: 1rem; z-index: 500; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: .38rem .75rem; font-family: var(--font-ui); font-size: .73rem; color: var(--muted); opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s; pointer-events: none; }
+    #save-ind.show { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ───────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #topbar { flex-direction: column; align-items: stretch; }
+      .ctrl-row { justify-content: center; }
+      #wrap { padding: .75rem .5rem 2.5rem; }
+      #content { padding: 1rem; border-radius: 10px; }
+      .panel { width: min(var(--panel-w), 90vw); }
+      .btn { flex: 1 1 auto; }
+    }
+    @media (max-width: 480px) {
+      .brand-title { font-size: 1.05rem; }
+      #content { padding: .85rem; }
+      .btn { font-size: .82rem; padding: .44rem .6rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="prog-track" aria-hidden="true"><div id="prog-fill"></div></div>
+
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-title">بأسمائه نحيا</span>
+      <span class="brand-sub" id="part-badge">جارٍ التحميل…</span>
+    </div>
+    <nav class="ctrl-row" aria-label="أدوات القارئ">
+      <a href="index.html" class="btn">🏠 الرئيسية</a>
+      <button class="btn" id="btn-names"    type="button">الأسماء</button>
+      <button class="btn" id="btn-settings" type="button">الإعدادات</button>
+      <button class="btn primary" id="btn-continue" type="button">استمرار</button>
+    </nav>
+  </header>
+
+  <!-- Names panel -->
+  <aside id="names-panel" class="panel" aria-label="أسماء الله الحسنى">
+    <button class="panel-close" id="close-names" type="button" aria-label="إغلاق">✕</button>
+    <h3>أسماء الله الحسنى</h3>
+    <div id="names-list"></div>
+  </aside>
+
+  <!-- Settings panel -->
+  <aside id="settings-panel" class="panel" aria-label="الإعدادات">
+    <button class="panel-close" id="close-settings" type="button" aria-label="إغلاق">✕</button>
+    <h3>الإعدادات</h3>
+    <div class="s-row">
+      <span class="s-label">المظهر</span>
+      <div class="theme-grid">
+        <button class="th-btn" data-t="light"  type="button">فاتح</button>
+        <button class="th-btn" data-t="dark"   type="button">غامق</button>
+        <button class="th-btn" data-t="sepia"  type="button">سيبيا</button>
+        <button class="th-btn" data-t="sand"   type="button">رملي</button>
+      </div>
+    </div>
+    <div class="s-row">
+      <label class="s-label" for="font-sel">الخط</label>
+      <select id="font-sel">
+        <option value="amiri">Amiri (أميري)</option>
+        <option value="cairo">Cairo (قاهرة)</option>
+        <option value="tajawal">Tajawal (تجوال)</option>
+        <option value="noto">Noto Naskh Arabic</option>
+      </select>
+    </div>
+    <div class="s-row">
+      <span class="s-label">حجم الخط</span>
+      <div class="num-row">
+        <button class="num-btn" id="font-dec" type="button">−</button>
+        <span   class="num-val" id="font-val">18px</span>
+        <button class="num-btn" id="font-inc" type="button">+</button>
+      </div>
+    </div>
+    <div class="s-row">
+      <label class="s-label" for="lh-range">ارتفاع السطر</label>
+      <div class="num-row">
+        <input type="range" id="lh-range" min="1.5" max="3" step="0.1" value="2">
+        <span  class="num-val" id="lh-val">2.0</span>
+      </div>
+    </div>
+    <button class="btn" id="btn-reset" type="button" style="width:100%;margin-top:.4rem">إعادة الضبط</button>
+  </aside>
+
+  <div id="overlay" aria-hidden="true"></div>
+
+  <main id="wrap">
+    <!-- Loading bar shown during multi-chunk load -->
+    <div id="load-bar-wrap" aria-live="polite">
+      <span id="load-bar-txt">جارٍ التحميل…</span>
+      <div id="load-bar-bg"><div id="load-bar-fill"></div></div>
+    </div>
+    <div id="content">
+      <div class="msg"><h2>جارٍ التحميل…</h2><p>يُرجى الانتظار</p></div>
+    </div>
+    <div id="load-spinner"></div>
+  </main>
+
+  <!-- Self-contained content for part 5 -->
+  <template id="inline-part-data" data-part-id="5"></template>
+
+  <div id="save-ind" role="status" aria-live="polite">تم حفظ موضع القراءة ✓</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ══════════════════════════════════════════════════════════
+   DATA — all parts and names with their starting chunks
+══════════════════════════════════════════════════════════ */
+const PARTS = [
+  {
+    id:1, title:'أسماء الجمال والرَّحمة',
+    base:'chapters/part1', count:39,
+    names:[
+      { ar:'الرَّحْمٰن',            chunk:4  },
+      { ar:'الرَّحِيم',             chunk:5  },
+      { ar:'الغَفُور',              chunk:6  },
+      { ar:'الغَفَّار',             chunk:7  },
+      { ar:'التَّوَّاب',            chunk:8  },
+      { ar:'الـعَفـُـو',            chunk:9  },
+      { ar:'الــبـَـرُّ',           chunk:11 },
+      { ar:'الــرَّؤوف',            chunk:12 },
+      { ar:'الكَرِيم',              chunk:14 },
+      { ar:'الوَدُود',              chunk:15 },
+      { ar:'الـمُؤمِن الصَّادِق',   chunk:16 },
+      { ar:'اللَّطيف',              chunk:18 },
+      { ar:'الشَّكُور',             chunk:19 },
+      { ar:'ٱلْحَلِيمُ',            chunk:20 },
+      { ar:'ٱلْحَيِيُّ',            chunk:22 },
+      { ar:'ٱلسِّتِّيرُ',           chunk:23 },
+      { ar:'ٱلطَّيِّبُ',            chunk:25 },
+      { ar:'ٱلْجَمِيلُ',            chunk:26 },
+      { ar:'ٱلْمُحْسِنُ',           chunk:28 },
+      { ar:'ٱلْمُعْطِي ٱلْجَوَادُ', chunk:30 },
+      { ar:'ٱلْمَنَّانُ',           chunk:32 },
+      { ar:'ٱلْوَهَّابُ',           chunk:34 },
+      { ar:'ٱلرَّفِيقُ',            chunk:36 },
+    ]
+  },
+  {
+    id:2, title:'أسماء الجلال والكِبرياء',
+    base:'chapters/part2', count:35,
+    names:[
+      { ar:'ٱلْمَلِكُ وٱلْمَلِيكُ',         chunk:1  },
+      { ar:'ٱلْعَزِيزُ ٱلْجَبَّارُ',         chunk:4  },
+      { ar:'ٱلْمُتَكَبِّرُ',                 chunk:8  },
+      { ar:'ٱلْقَاهِرُ ٱلْقَهَّارُ',         chunk:10 },
+      { ar:'ٱلدَّيَّانُ',                    chunk:14 },
+      { ar:'ٱلسَّيِّدُ',                     chunk:17 },
+      { ar:'ٱلْكَبِيرُ',                     chunk:20 },
+      { ar:'ٱللَّهُ ٱلْإِلَٰهُ',             chunk:23 },
+      { ar:'ذُو ٱلْجَلَالِ وَٱلْإِكْرَامِ',   chunk:28 },
+      { ar:'الرَّب',                         chunk:31 },
+    ]
+  },
+  {
+    id:3, title:'أسماء التنزيه والعُلُوّ',
+    base:'chapters/part3', count:41,
+    names:[
+      { ar:'ٱلْعَظِيمُ',                         chunk:1  },
+      { ar:'ٱلْعَلِيُّ ٱلْأَعْلَى ٱلْمُتَعَالِي', chunk:5  },
+      { ar:'ٱلْأَحَدُ ٱلْوَاحِدُ',               chunk:10 },
+      { ar:'ٱلْوِتْرُ',                          chunk:15 },
+      { ar:'ٱلصَّمَدُ',                          chunk:18 },
+      { ar:'ٱلْقُدُّوسُ ٱلسُّبُّوحُ',            chunk:22 },
+      { ar:'ٱلْمَجِيدُ',                         chunk:26 },
+      { ar:'ٱلنُّورُ',                           chunk:30 },
+      { ar:'ٱلْحَقُّ ٱلْمُبِينُ',                chunk:33 },
+    ]
+  },
+  {
+    id:4, title:'أسماء العِلم والرِّقابة',
+    base:'chapters/part4', count:51,
+    names:[
+      { ar:'ٱلْعَلِيمُ',  chunk:2  },
+      { ar:'ٱلْخَبِيرُ',  chunk:6  },
+      { ar:'ٱلسَّمِيعُ',  chunk:10 },
+      { ar:'ٱلْبَصِيرُ',  chunk:14 },
+      { ar:'ٱلرَّقِيبُ',  chunk:17 },
+      { ar:'ٱلشَّهِيدُ',  chunk:20 },
+      { ar:'ٱلْحَسِيبُ',  chunk:24 },
+      { ar:'ٱلْحَفِيظُ',  chunk:28 },
+      { ar:'ٱلْحَافِظُ',  chunk:32 },
+      { ar:'ٱلْحَكِيمُ',  chunk:35 },
+      { ar:'ٱلْحَكَمُ',   chunk:39 },
+      { ar:'ٱلْكَفِيلُ',  chunk:43 },
+      { ar:'ٱلْكَافِي',   chunk:47 },
+    ]
+  },
+  {
+    id:5, title:'أسماء القُدرة والخَلق',
+    base:'chapters/part5', count:42,
+    names:[
+      { ar:'ٱلْقَدِيرُ',           chunk:1  },
+      { ar:'ٱلْقَادِرُ',           chunk:5  },
+      { ar:'ٱلْمُقْتَدِرُ',        chunk:8  },
+      { ar:'ٱلْقَوِيُّ',           chunk:11 },
+      { ar:'ٱلْمَتِينُ',           chunk:14 },
+      { ar:'ٱلْخَالِقُ',           chunk:16 },
+      { ar:'ٱلْخَلَّاقُ',          chunk:19 },
+      { ar:'ٱلْبَارِئُ',           chunk:21 },
+      { ar:'ٱلْمُصَوِّرُ',         chunk:25 },
+      { ar:'ٱلرَّزَّاقُ الرَّازِق', chunk:33 },
+    ]
+  },
+  {
+    id:6, title:'أسماء التدبير والولاية',
+    base:'chapters/part6', count:33,
+    names:[
+      { ar:'ٱلْقَابِضُ',   chunk:1  },
+      { ar:'ٱلْبَاسِطُ',   chunk:4  },
+      { ar:'ٱلْفَتَّاحُ',  chunk:8  },
+      { ar:'ٱلْمُقِيتُ',   chunk:13 },
+      { ar:'ٱلْمُقَدِّمُ', chunk:19 },
+      { ar:'ٱلْمُؤَخِّرُ', chunk:24 },
+      { ar:'ٱلْوَارِثُ',   chunk:29 },
+    ]
+  },
+  {
+    id:7, title:'أسماء ختامية',
+    base:'chapters/part7', count:38,
+    names:[
+      { ar:'الْأَوَّلُ وَالْآخِرُ وَالظَّاهِرُ وَالْبَاطِنُ', chunk:1  },
+      { ar:'الْقَرِيبُ الْمُجِيبُ الشَّافِي',                 chunk:5  },
+      { ar:'ٱلْغَالِبُ ٱلنَّصِيرُ',                          chunk:8  },
+      { ar:'ٱلْوَكِيلُ ٱلْحَيُّ ٱلْقَيُّومُ',               chunk:13 },
+      { ar:'السَّلَام',                                       chunk:17 },
+      { ar:'الغَنِيّ',                                        chunk:20 },
+      { ar:'ٱلْوَلِيُّ ٱلْمَوْلَى',                          chunk:23 },
+      { ar:'الهَادِي',                                        chunk:28 },
+      { ar:'ٱلْمُهَيْمِنُ ٱلْوَاسِعُ ٱلْمُحِيطُ',           chunk:32 },
+    ]
+  }
+];
+
+/* ══════════════════════════════════════════════════════════
+   STORAGE
+══════════════════════════════════════════════════════════ */
+const SK     = 'asma_v3_';
+const GLOB_K = SK + 'global';
+const SETT_K = SK + 'settings';
+
+function stor(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(_){} }
+function read(k, d=null) { try { const r=localStorage.getItem(k); return r?JSON.parse(r):d; } catch(_){ return d; } }
+
+function saveGlobal() {
+  if (!S.part) return;
+  const rec = {
+    partId:   S.part.id,
+    chunkNum: S.currentChunk,
+    nameAr:   S.currentNameAr,
+    ts:       Date.now()
+  };
+  stor(GLOB_K, rec);
+  stor(SK + 'part' + S.part.id, rec);
+}
+
+/* ══════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════ */
+const S = {
+  part: null,
+  nextChunk: 1,
+  currentChunk: 1,
+  currentNameAr: '',
+  loadingNext: false,
+  lastY: 0, scrollDir: 0,
+  saveTimer: null,
+  theme: 'light', fontKey: 'amiri', fontSize: 18, lineHeight: 2,
+};
+
+/* ══════════════════════════════════════════════════════════
+   DOM REFS
+══════════════════════════════════════════════════════════ */
+const g = id => document.getElementById(id);
+const D = {
+  topbar:   g('topbar'),
+  badge:    g('part-badge'),
+  content:  g('content'),
+  spinner:  g('load-spinner'),
+  prog:     g('prog-fill'),
+  lbWrap:   g('load-bar-wrap'),
+  lbTxt:    g('load-bar-txt'),
+  lbFill:   g('load-bar-fill'),
+  namesP:   g('names-panel'),
+  setP:     g('settings-panel'),
+  nameL:    g('names-list'),
+  overlay:  g('overlay'),
+  saveInd:  g('save-ind'),
+  btnN:     g('btn-names'),
+  btnS:     g('btn-settings'),
+  btnC:     g('btn-continue'),
+  btnR:     g('btn-reset'),
+  fontSel:  g('font-sel'),
+  fontDec:  g('font-dec'),
+  fontInc:  g('font-inc'),
+  fontVal:  g('font-val'),
+  lhR:      g('lh-range'),
+  lhV:      g('lh-val'),
+};
+
+/* ══════════════════════════════════════════════════════════
+   FONT LOADER (non-blocking)
+══════════════════════════════════════════════════════════ */
+const FONT_URLS = {
+  amiri:   'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap',
+  cairo:   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
+  tajawal: 'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap',
+  noto:    'https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&display=swap',
+};
+const FONT_CSS = {
+  amiri:   '"Amiri",Georgia,"Times New Roman",serif',
+  cairo:   '"Cairo",system-ui,sans-serif',
+  tajawal: '"Tajawal",system-ui,sans-serif',
+  noto:    '"Noto Naskh Arabic",Georgia,serif',
+};
+const loadedFonts = new Set();
+function loadFont(k) {
+  if (loadedFonts.has(k) || !FONT_URLS[k]) return;
+  loadedFonts.add(k);
+  const l = document.createElement('link');
+  l.rel = 'stylesheet'; l.href = FONT_URLS[k];
+  document.head.appendChild(l);
+}
+loadFont('amiri');
+setTimeout(() => loadFont('cairo'), 400);
+
+/* ══════════════════════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════════════════════ */
+function applyTheme(t) {
+  S.theme = t;
+  document.body.classList.remove('dark','sepia','sand');
+  if (t !== 'light') document.body.classList.add(t);
+  document.querySelectorAll('.th-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+}
+function applyFont(k) {
+  S.fontKey = k; loadFont(k);
+  document.documentElement.style.setProperty('--font', FONT_CSS[k]);
+  D.fontSel.value = k;
+}
+function applySize(px) {
+  S.fontSize = px;
+  document.documentElement.style.setProperty('--size', px+'px');
+  D.fontVal.textContent = px+'px';
+}
+function applyLH(v) {
+  S.lineHeight = v;
+  document.documentElement.style.setProperty('--lh', v);
+  D.lhV.textContent = parseFloat(v).toFixed(1);
+  D.lhR.value = v;
+}
+function saveSett() {
+  stor(SETT_K, { theme:S.theme, fontKey:S.fontKey, fontSize:S.fontSize, lineHeight:S.lineHeight });
+}
+function loadSett() {
+  const s = read(SETT_K, {});
+  applyTheme(s.theme    || 'light');
+  applyFont (s.fontKey  || 'amiri');
+  applySize (s.fontSize || 18);
+  applyLH   (s.lineHeight || 2);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANELS
+══════════════════════════════════════════════════════════ */
+let openP = null;
+function showPanel(p) {
+  if (openP) openP.classList.remove('open');
+  openP = p; p.classList.add('open');
+  D.overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function hidePanel() {
+  if (openP) { openP.classList.remove('open'); openP = null; }
+  D.overlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAMES LIST
+══════════════════════════════════════════════════════════ */
+function buildNames() {
+  const allNames = PARTS.flatMap(p => p.names.map(n => ({ ...n, partId:p.id, partTitle:p.title })));
+  D.nameL.innerHTML = allNames.map(n =>
+    `<button class="name-btn" data-pid="${n.partId}" data-chunk="${n.chunk}" data-ar="${n.ar}" type="button">
+       ${n.ar}<small>${n.partTitle}</small>
+     </button>`
+  ).join('');
+  D.nameL.addEventListener('click', e => {
+    const b = e.target.closest('.name-btn');
+    if (!b) return;
+    hidePanel();
+    goToName(+b.dataset.pid, +b.dataset.chunk, b.dataset.ar);
+  });
+}
+function markActive(partId, chunkNum) {
+  document.querySelectorAll('.name-btn').forEach(b =>
+    b.classList.toggle('active', +b.dataset.pid === partId && +b.dataset.chunk === chunkNum));
+}
+
+/* ══════════════════════════════════════════════════════════
+   CHUNK FETCHER  (cache-first, ~185 KB per chunk)
+══════════════════════════════════════════════════════════ */
+const chunkCache = {};
+
+async function fetchChunk(part, num) {
+  const key = `${part.id}-${num}`;
+  if (chunkCache[key] !== undefined) return chunkCache[key];
+  const url = `${part.base}/chunk-${String(num).padStart(3,'0')}.html`;
+  try {
+    const r = await fetch(url, { cache: 'force-cache' });
+    if (!r.ok) { chunkCache[key] = null; return null; }
+    const html = await r.text();
+    chunkCache[key] = html;
+    return html;
+  } catch(_) { chunkCache[key] = null; return null; }
+}
+
+/* Silently prefetch a chunk into cache */
+function prefetchChunk(part, num) {
+  if (num < 1 || num > part.count) return;
+  const key = `${part.id}-${num}`;
+  if (chunkCache[key] !== undefined) return;
+  fetch(`${part.base}/chunk-${String(num).padStart(3,'0')}.html`, { cache: 'force-cache', priority:'low' })
+    .catch(() => {});
+}
+
+/* Prefetch adjacent parts' first chunks for instant switching */
+const warmedParts = new Set();
+function prefetchAdjacent(currentId) {
+  [currentId - 1, currentId + 1].forEach(id => {
+    if (warmedParts.has(id)) return;
+    const part = PARTS.find(p => p.id === id);
+    if (!part) return;
+    warmedParts.add(id);
+    const run = () => {
+      fetch(`part${id}.html`, { cache:'force-cache', priority:'low' }).catch(()=>{});
+      prefetchChunk(part, 1);
+    };
+    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout:3000 });
+    else setTimeout(run, 1000);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   LAYOUT FIXERS
+══════════════════════════════════════════════════════════ */
+function fixImages(root) {
+  root.querySelectorAll('img').forEach(img => {
+    const src = img.getAttribute('src') || '';
+    if (src.includes('.fld/') || src.includes('%20') || src.startsWith('file:'))
+      img.style.display = 'none';
+  });
+}
+
+function fixLayout() {
+  const c = D.content;
+  c.querySelectorAll('[style*="position:absolute"],[style*="position: absolute"]').forEach(el => {
+    el.style.position = 'relative';
+    el.style.left = '';
+    el.style.top  = '';
+  });
+  c.querySelectorAll('[style]').forEach(el => {
+    const s = el.style;
+    const col = s.color;
+    if (col && (col === 'white' || col === '#ffffff' || col === 'rgb(255, 255, 255)')) {
+      const bg = s.backgroundColor;
+      const hasDarkBg = bg && bg !== '' && bg !== 'transparent' &&
+                        bg !== 'rgba(0, 0, 0, 0)' && bg !== 'white' &&
+                        bg !== '#ffffff' && bg !== 'rgb(255, 255, 255)';
+      if (!hasDarkBg) s.color = '';
+    }
+  });
+  c.querySelectorAll('table').forEach(tbl => {
+    if (tbl.parentElement && tbl.parentElement.classList.contains('tbl-wrap')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'tbl-wrap';
+    tbl.parentNode.insertBefore(wrap, tbl);
+    wrap.appendChild(tbl);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAME HEADING FINDER
+══════════════════════════════════════════════════════════ */
+function normalize(s) {
+  return s
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    .replace(/[\u0671أإآا]/g, 'ا')
+    .replace(/[()（）\[\]]/g, '')
+    .replace(/\s+/g, '');
+}
+
+function findNameHeading(nameAr) {
+  const target = normalize(nameAr);
+  const targetShort = target.slice(0, 6);
+  for (const el of D.content.querySelectorAll('h1,h2,h3,h4')) {
+    const txt = normalize(el.textContent || '');
+    if (txt.includes(target) || (targetShort.length > 3 && txt.includes(targetShort))) return el;
+  }
+  for (const el of D.content.querySelectorAll('p')) {
+    const txt = normalize(el.textContent || '');
+    if (target.length > 4 && txt === target) return el;
+  }
+  return null;
+}
+
+/* Detect which name the reader is currently on, based on scroll */
+function detectCurrentName() {
+  if (!S.part) return;
+  const mid = window.scrollY + window.innerHeight * 0.3;
+  let best = S.part.names[0];
+  for (const n of S.part.names) {
+    const el = findNameHeading(n.ar);
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      if (top <= mid) { best = n; }
+    }
+  }
+  if (best) {
+    S.currentChunk  = best.chunk;
+    S.currentNameAr = best.ar;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   PROGRESS & UI HELPERS
+══════════════════════════════════════════════════════════ */
+function updateProg() {
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  D.prog.style.width = (total > 0 ? Math.min(100, window.scrollY / total * 100) : 0).toFixed(1) + '%';
+}
+function updateBadge() {
+  if (!S.part) return;
+  D.badge.textContent = `${S.part.title} — الجزء ${S.part.id} من 7`;
+}
+function flashSave() {
+  D.saveInd.classList.add('show');
+  clearTimeout(D.saveInd._t);
+  D.saveInd._t = setTimeout(() => D.saveInd.classList.remove('show'), 2000);
+}
+function scheduleSave() {
+  clearTimeout(S.saveTimer);
+  S.saveTimer = setTimeout(() => {
+    detectCurrentName();
+    saveGlobal();
+    flashSave();
+  }, 2500);
+}
+function showLoadBar(cur, tot) {
+  D.lbWrap.classList.add('show');
+  D.lbTxt.textContent = `جارٍ التحميل…`;
+  D.lbFill.style.width = (tot > 0 ? Math.round(cur / tot * 100) : 0) + '%';
+}
+function hideLoadBar() {
+  D.lbWrap.classList.remove('show');
+  D.lbFill.style.width = '0';
+}
+
+/* ══════════════════════════════════════════════════════════
+   CORE: PROGRESSIVE CHUNK LOADER
+   Shows the first chunk within ~200 ms, loads the rest
+   silently in the background.
+══════════════════════════════════════════════════════════ */
+function appendChunk(wrapper, html, num) {
+  const div = document.createElement('div');
+  div.className = 'chunk';
+  div.dataset.chunk = num;
+  div.innerHTML = html;
+  fixImages(div);
+  wrapper.appendChild(div);
+}
+
+async function loadPart(part, startChunk, scrollToName) {
+  S.part = part;
+  S.nextChunk = Math.max(1, startChunk || 1);
+  S.loadingNext = false;
+  S.currentChunk  = S.nextChunk;
+  S.currentNameAr = scrollToName || '';
+
+  D.content.innerHTML = '';
+  D.spinner.textContent = '';
+  hideLoadBar();
+  updateBadge();
+
+  /* Build content wrapper */
+  const wrapper = document.createElement('div');
+  wrapper.className = 'chunks-wrapper';
+  wrapper.setAttribute('data-part', part.id);
+  D.content.appendChild(wrapper);
+
+  /* ── Fetch & display first chunk immediately ── */
+  showLoadBar(1, 2);
+  const firstHtml = await fetchChunk(part, S.nextChunk);
+  hideLoadBar();
+
+  if (firstHtml === null) {
+    if (location.protocol === 'file:') {
+      D.content.innerHTML =
+        '<div class="msg">' +
+        '<h2>لا يمكن التشغيل من ملف محلي</h2>' +
+        '<p>يعمل الموقع بشكل كامل بعد رفعه على GitHub Pages، ' +
+        'أو شغّله محلياً بخادم بسيط:</p>' +
+        '<p style="direction:ltr;text-align:left;background:#f4ebe0;padding:.7rem 1rem;border-radius:8px;font-family:monospace;font-size:.88rem;margin-top:.8rem;display:inline-block">python3 -m http.server 8000</p>' +
+        '<p>ثم افتح <code>http://localhost:8000/</code></p></div>';
+      return;
+    }
+    D.content.innerHTML =
+      '<div class="msg"><h2>تعذّر تحميل المحتوى</h2>' +
+      '<p>يُرجى التحقق من اتصالك بالإنترنت وإعادة تحميل الصفحة.</p></div>';
+    return;
+  }
+
+  appendChunk(wrapper, firstHtml, S.nextChunk);
+  S.nextChunk++;
+  fixLayout();
+  prefetchAdjacent(part.id);
+
+  /* ── Scroll to name heading ── */
+  if (scrollToName) {
+    await new Promise(r => requestAnimationFrame(r));
+    await new Promise(r => setTimeout(r, 80));
+    const el = findNameHeading(scrollToName);
+    if (el) {
+      const y = el.getBoundingClientRect().top + window.scrollY - 90;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  } else {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  updateProg();
+
+  /* ── Load remaining chunks in background ── */
+  loadRemaining(part, wrapper);
+}
+
+async function loadRemaining(part, wrapper) {
+  if (S.loadingNext) return;
+  S.loadingNext = true;
+  while (S.nextChunk <= part.count && S.part === part) {
+    const html = await fetchChunk(part, S.nextChunk);
+    if (html === null) break;
+    appendChunk(wrapper, html, S.nextChunk);
+    S.nextChunk++;
+    /* Yield to browser so scroll/input stays responsive */
+    await new Promise(r => setTimeout(r, 30));
+  }
+  if (S.part === part) fixLayout();
+  S.loadingNext = false;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════════════════════ */
+async function goToName(partId, chunkNum, nameAr) {
+  const part = PARTS.find(p => p.id === partId);
+  if (!part) return;
+
+  /* If this page is for a different part, navigate there */
+  const tpl = document.getElementById('inline-part-data');
+  const thisPartId = tpl ? +tpl.dataset.partId : 0;
+  if (thisPartId && thisPartId !== partId) {
+    location.href = `part${partId}.html?start=${chunkNum}`;
+    return;
+  }
+
+  const url = new URL(location.href);
+  url.searchParams.set('part',  partId);
+  url.searchParams.set('start', chunkNum);
+  url.searchParams.delete('restore');
+  history.replaceState(null, '', url.toString());
+
+  markActive(partId, chunkNum);
+  S.currentChunk  = chunkNum;
+  S.currentNameAr = nameAr || '';
+  saveGlobal();
+  await loadPart(part, chunkNum, nameAr);
+}
+
+async function restoreSession(saved) {
+  const part = PARTS.find(p => p.id === saved.partId);
+  if (!part) return false;
+
+  /* If this page is for a different part, navigate there */
+  const tpl = document.getElementById('inline-part-data');
+  const thisPartId = tpl ? +tpl.dataset.partId : 0;
+  if (thisPartId && thisPartId !== saved.partId) {
+    location.href = `part${saved.partId}.html?start=${saved.chunkNum || 1}`;
+    return true;
+  }
+
+  markActive(saved.partId, saved.chunkNum || 1);
+  S.currentChunk  = saved.chunkNum || 1;
+  S.currentNameAr = saved.nameAr  || '';
+  await loadPart(part, saved.chunkNum || 1, saved.nameAr || null);
+  return true;
+}
+
+async function continueReading() {
+  const saved = read(GLOB_K);
+  if (saved && saved.partId) {
+    await restoreSession(saved);
+  } else {
+    await goToName(1, 4, 'الرَّحْمٰن');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SCROLL HANDLER
+══════════════════════════════════════════════════════════ */
+let ticking = false;
+function onScroll() {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(() => {
+    ticking = false;
+    updateProg();
+    const y   = window.scrollY;
+    const dir = y > S.lastY ? 1 : -1;
+    if (dir !== S.scrollDir) {
+      S.scrollDir = dir;
+      D.topbar.classList.toggle('hidden', dir === 1 && y > 100);
+    }
+    S.lastY = y;
+    scheduleSave();
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   WIRE EVENTS
+══════════════════════════════════════════════════════════ */
+function wireEvents() {
+  D.btnN.addEventListener('click', () => showPanel(D.namesP));
+  D.btnS.addEventListener('click', () => showPanel(D.setP));
+  D.overlay.addEventListener('click', hidePanel);
+  g('close-names').addEventListener('click', hidePanel);
+  g('close-settings').addEventListener('click', hidePanel);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hidePanel(); });
+
+  D.btnC.addEventListener('click', continueReading);
+
+  document.querySelectorAll('.th-btn').forEach(b => {
+    b.addEventListener('click', () => { applyTheme(b.dataset.t); saveSett(); });
+  });
+  D.fontSel.addEventListener('change', () => { applyFont(D.fontSel.value); saveSett(); });
+  D.fontInc.addEventListener('click', () => { applySize(Math.min(32, S.fontSize + 1)); saveSett(); });
+  D.fontDec.addEventListener('click', () => { applySize(Math.max(12, S.fontSize - 1)); saveSett(); });
+  D.lhR.addEventListener('input',  () => { applyLH(D.lhR.value); saveSett(); });
+  D.btnR.addEventListener('click', () => {
+    applyTheme('light'); applyFont('amiri'); applySize(18); applyLH(2); saveSett();
+  });
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  const forceSave = () => {
+    clearTimeout(S.saveTimer);
+    detectCurrentName();
+    saveGlobal();
+  };
+  window.addEventListener('pagehide',           forceSave);
+  window.addEventListener('beforeunload',       forceSave);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) forceSave(); });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 820) hidePanel();
+    updateProg();
+  }, { passive: true });
+}
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+async function init() {
+  loadSett();
+  buildNames();
+  wireEvents();
+
+  const p      = new URLSearchParams(location.search);
+  const pParam = +p.get('part')  || 0;
+  const start  = +p.get('start') || 0;
+
+  /* Which part page is this? (data-part-id on the empty template) */
+  const tpl        = document.getElementById('inline-part-data');
+  const thisPartId = tpl ? +tpl.dataset.partId : 0;
+
+  /* Direct name navigation from index.html: ?start=N (no ?part= needed) */
+  const targetPart = pParam || thisPartId;
+  if (targetPart && start) {
+    const part      = PARTS.find(q => q.id === targetPart);
+    const nameEntry = part && part.names.find(n => n.chunk === start);
+    const nameAr    = nameEntry ? nameEntry.ar : null;
+    markActive(targetPart, start);
+    await goToName(targetPart, start, nameAr);
+    return;
+  }
+
+  /* Part page opened directly (no start param) — restore saved position */
+  if (thisPartId) {
+    const saved = read(SK + 'part' + thisPartId);
+    if (saved && (saved.chunkNum || saved.maxChunk)) {
+      const chk = saved.chunkNum || saved.maxChunk;
+      await restoreSession({ ...saved, partId: thisPartId, chunkNum: chk });
+      return;
+    }
+    await goToName(thisPartId, 1, null);
+    return;
+  }
+
+  /* No URL params, no part context — auto-restore global session */
+  const glob = read(GLOB_K);
+  if (glob && glob.partId) { await restoreSession(glob); return; }
+
+  /* Very first visit */
+  await goToName(1, 4, 'الرَّحْمٰن');
+}
+
+init();
+
+/* ══════════════════════════════════════════════════════════
+   SERVICE WORKER
+══════════════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+  });
+}
+
+})();
+</script>
+</body></html>
