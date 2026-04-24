@@ -554,14 +554,23 @@ function initFeedback() {
       const json = await res.json().catch(() => ({}));
       if (res.ok && json.success !== false) {
         status.style.color = '#2e7d32';
-        status.textContent = 'شكراً! وصلت ملاحظتك بنجاح ✓';
+        status.innerHTML =
+          'شكراً! وصلت ملاحظتك بنجاح ✓<br>' +
+          '<small style="color:var(--muted);font-size:.78rem">' +
+          'إذا كانت هذه أول مرة ترسل فيها ملاحظة، ابحث في صندوق بريدك عن رسالة تفعيل ' +
+          'من FormSubmit واضغط الرابط بداخلها.</small>';
         form.reset();
       } else {
         throw new Error('fail');
       }
     } catch(_) {
       status.style.color = 'var(--accent)';
-      status.textContent = 'حدث خطأ في الإرسال. يُرجى المحاولة مرة أخرى.';
+      const _fbEmail = atob(_ep);
+      status.innerHTML =
+        'حدث خطأ في الإرسال. ' +
+        '<a href="mailto:' + _fbEmail + '?subject=' + encodeURIComponent('ملاحظة — بأسمائه نحيا') +
+        '&body=' + encodeURIComponent((document.getElementById('fb-msg').value||'')) + '" ' +
+        'style="color:var(--accent)">أرسل بريداً مباشراً</a> بدلاً من ذلك.';
     } finally {
       btn.disabled = false;
     }
@@ -976,6 +985,14 @@ async function init() {
     const part      = PARTS.find(q => q.id === targetPart);
     const nameEntry = part && part.names.find(n => n.chunk === start);
     const nameAr    = nameEntry ? nameEntry.ar : null;
+
+    /* If the user was previously reading this exact name, restore their scroll
+       position within the name (not just the heading) */
+    const _sv = read(SK + 'part' + targetPart) || read(GLOB_K);
+    if (_sv && _sv.partId === targetPart && _sv.nameAr === nameAr && (_sv.scrollOffset || 0) > 20) {
+      S.restoreScrollOffset = _sv.scrollOffset;
+    }
+
     await goToName(targetPart, start, nameAr);
     return;
   }

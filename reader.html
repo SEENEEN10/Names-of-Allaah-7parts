@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بأسمائه نحيا — الجزء 3</title>
+  <title>بأسمائه نحيا — القارئ</title>
   <meta name="description" content="قارئ كتاب بأسمائه نحيا — فقه الحب والتقوى في الأسماء الحسنى">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -176,13 +176,11 @@
     }
     #names-panel    { right: 0; transform: translateX(110%); }
     #settings-panel { left: 0;  transform: translateX(-110%); }
-    #feedback-panel { right: 0; transform: translateX(110%); }
-    #feedback-panel.open { transform: translateX(0); }
     .panel.open     { transform: translateX(0); }
 
     .panel h3 { color: var(--accent); font-size: 1.05rem; margin-bottom: .9rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border); }
 
-    .panel-close { float: left; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--muted); padding: .6rem .8rem; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
+    .panel-close { float: left; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--muted); padding: .2rem .4rem; }
     #settings-panel .panel-close { float: right; }
 
     /* Names list inside panel — flat, no categories */
@@ -252,35 +250,57 @@
     </div>
     <nav class="ctrl-row" aria-label="أدوات القارئ">
       <a href="index.html" class="btn">🏠 الرئيسية</a>
-      <button class="btn" id="btn-feedback" type="button">💬 ملاحظات</button>
+      <button class="btn" id="btn-names"    type="button">الأسماء</button>
+      <button class="btn" id="btn-settings" type="button">الإعدادات</button>
       <button class="btn primary" id="btn-continue" type="button">استمرار</button>
     </nav>
   </header>
 
-  <!-- Feedback panel -->
-  <aside id="feedback-panel" class="panel" aria-label="إرسال ملاحظة">
-    <button class="panel-close" id="close-feedback" type="button" aria-label="إغلاق">✕</button>
-    <h3>💬 أرسل ملاحظة</h3>
-    <form id="feedback-form" novalidate>
-      <div class="s-row">
-        <label class="s-label" for="fb-name">الاسم (اختياري)</label>
-        <input type="text" id="fb-name" name="name" placeholder="اسمك…"
-               style="width:100%;padding:.5rem .7rem;border:1px solid var(--border);border-radius:8px;
-                      background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:.9rem;">
+  <!-- Names panel -->
+  <aside id="names-panel" class="panel" aria-label="أسماء الله الحسنى">
+    <button class="panel-close" id="close-names" type="button" aria-label="إغلاق">✕</button>
+    <h3>أسماء الله الحسنى</h3>
+    <div id="names-list"></div>
+  </aside>
+
+  <!-- Settings panel -->
+  <aside id="settings-panel" class="panel" aria-label="الإعدادات">
+    <button class="panel-close" id="close-settings" type="button" aria-label="إغلاق">✕</button>
+    <h3>الإعدادات</h3>
+    <div class="s-row">
+      <span class="s-label">المظهر</span>
+      <div class="theme-grid">
+        <button class="th-btn" data-t="light"  type="button">فاتح</button>
+        <button class="th-btn" data-t="dark"   type="button">غامق</button>
+        <button class="th-btn" data-t="sepia"  type="button">سيبيا</button>
+        <button class="th-btn" data-t="sand"   type="button">رملي</button>
       </div>
-      <div class="s-row">
-        <label class="s-label" for="fb-msg">الملاحظة <span style="color:var(--accent)">*</span></label>
-        <textarea id="fb-msg" name="message" rows="5" required
-                  placeholder="اكتب ملاحظتك هنا…"
-                  style="width:100%;padding:.5rem .7rem;border:1px solid var(--border);border-radius:8px;
-                         background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:.9rem;
-                         resize:vertical;"></textarea>
+    </div>
+    <div class="s-row">
+      <label class="s-label" for="font-sel">الخط</label>
+      <select id="font-sel">
+        <option value="amiri">Amiri (أميري)</option>
+        <option value="cairo">Cairo (قاهرة)</option>
+        <option value="tajawal">Tajawal (تجوال)</option>
+        <option value="noto">Noto Naskh Arabic</option>
+      </select>
+    </div>
+    <div class="s-row">
+      <span class="s-label">حجم الخط</span>
+      <div class="num-row">
+        <button class="num-btn" id="font-dec" type="button">−</button>
+        <span   class="num-val" id="font-val">18px</span>
+        <button class="num-btn" id="font-inc" type="button">+</button>
       </div>
-      <div id="fb-status" style="font-family:var(--font-ui);font-size:.84rem;margin-bottom:.6rem;min-height:1.2em;"></div>
-      <button type="submit" class="btn primary" style="width:100%;justify-content:center;">
-        إرسال الملاحظة ✉
-      </button>
-    </form>
+    </div>
+    <div class="s-row">
+      <label class="s-label" for="lh-range">ارتفاع السطر</label>
+      <div class="num-row">
+        <input type="range" id="lh-range" min="1.5" max="3" step="0.1" value="2">
+        <span  class="num-val" id="lh-val">2.0</span>
+      </div>
+    </div>
+    <button class="btn" id="btn-reset" type="button" style="width:100%;margin-top:.4rem">إعادة الضبط</button>
   </aside>
 
   <div id="overlay" aria-hidden="true"></div>
@@ -296,9 +316,6 @@
     </div>
     <div id="load-spinner"></div>
   </main>
-
-  <!-- Self-contained content for part 3 -->
-  <template id="inline-part-data" data-part-id="3"></template>
 
   <div id="save-ind" role="status" aria-live="polite">تم حفظ موضع القراءة ✓</div>
 
@@ -440,44 +457,27 @@ const PARTS = [
 ══════════════════════════════════════════════════════════ */
 const SK     = 'asma_v3_';
 const GLOB_K = SK + 'global';
+const SETT_K = SK + 'settings';
 
 function stor(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(_){} }
 function read(k, d=null) { try { const r=localStorage.getItem(k); return r?JSON.parse(r):d; } catch(_){ return d; } }
 
 function saveGlobal() {
   if (!S.part) return;
-  let scrollOffset = 0;
-  if (S.currentNameAr) {
-    const el = findNameHeading(S.currentNameAr);
-    if (el) {
-      const nameTop = el.getBoundingClientRect().top + window.scrollY - 90;
-      scrollOffset = Math.max(0, window.scrollY - nameTop);
-    }
-  }
-  const rec = {
-    partId:   S.part.id,
-    chunkNum: S.currentChunk,
-    nameAr:   S.currentNameAr,
-    scrollOffset,
-    ts:       Date.now()
-  };
+  const rec = { partId:S.part.id, maxChunk:S.maxC, scrollY:window.scrollY, ts:Date.now() };
   stor(GLOB_K, rec);
-  stor(SK + 'part' + S.part.id, rec);
+  stor(SK+'part'+S.part.id, rec);
 }
 
 /* ══════════════════════════════════════════════════════════
    STATE
 ══════════════════════════════════════════════════════════ */
 const S = {
-  part: null,
-  nextChunk: 1,
-  currentChunk: 1,
-  currentNameAr: '',
-  loadingNext: false,
-  lastY: 0, scrollDir: 0,
-  saveTimer: null,
-  restoreScrollOffset: 0,
-  restoreTargetY: -1,
+  part:null, maxC:0,
+  loadingNext:false,
+  lastY:0, scrollDir:0,
+  saveTimer:null,
+  theme:'light', fontKey:'amiri', fontSize:18, lineHeight:2,
 };
 
 /* ══════════════════════════════════════════════════════════
@@ -485,23 +485,93 @@ const S = {
 ══════════════════════════════════════════════════════════ */
 const g = id => document.getElementById(id);
 const D = {
-  topbar:    g('topbar'),
-  badge:     g('part-badge'),
-  content:   g('content'),
-  spinner:   g('load-spinner'),
-  prog:      g('prog-fill'),
-  lbWrap:    g('load-bar-wrap'),
-  lbTxt:     g('load-bar-txt'),
-  lbFill:    g('load-bar-fill'),
-  feedbackP: g('feedback-panel'),
-  overlay:   g('overlay'),
-  saveInd:   g('save-ind'),
-  btnFB:     g('btn-feedback'),
-  btnC:      g('btn-continue'),
+  topbar:   g('topbar'),
+  badge:    g('part-badge'),
+  content:  g('content'),
+  spinner:  g('load-spinner'),
+  prog:     g('prog-fill'),
+  lbWrap:   g('load-bar-wrap'),
+  lbTxt:    g('load-bar-txt'),
+  lbFill:   g('load-bar-fill'),
+  namesP:   g('names-panel'),
+  setP:     g('settings-panel'),
+  nameL:    g('names-list'),
+  overlay:  g('overlay'),
+  saveInd:  g('save-ind'),
+  btnN:     g('btn-names'),
+  btnS:     g('btn-settings'),
+  btnC:     g('btn-continue'),
+  btnR:     g('btn-reset'),
+  fontSel:  g('font-sel'),
+  fontDec:  g('font-dec'),
+  fontInc:  g('font-inc'),
+  fontVal:  g('font-val'),
+  lhR:      g('lh-range'),
+  lhV:      g('lh-val'),
 };
 
 /* ══════════════════════════════════════════════════════════
-   FEEDBACK PANEL
+   FONT LOADER (non-blocking — zero render delay)
+══════════════════════════════════════════════════════════ */
+const FONT_URLS = {
+  amiri:   'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap',
+  cairo:   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
+  tajawal: 'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap',
+  noto:    'https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&display=swap',
+};
+const FONT_CSS = {
+  amiri:   '"Amiri",Georgia,"Times New Roman",serif',
+  cairo:   '"Cairo",system-ui,sans-serif',
+  tajawal: '"Tajawal",system-ui,sans-serif',
+  noto:    '"Noto Naskh Arabic",Georgia,serif',
+};
+const loadedFonts = new Set();
+function loadFont(k) {
+  if (loadedFonts.has(k) || !FONT_URLS[k]) return;
+  loadedFonts.add(k);
+  const l = document.createElement('link');
+  l.rel = 'stylesheet'; l.href = FONT_URLS[k];
+  document.head.appendChild(l);
+}
+loadFont('amiri');
+setTimeout(() => loadFont('cairo'), 300);
+
+/* ══════════════════════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════════════════════ */
+function applyTheme(t) {
+  S.theme = t;
+  document.body.classList.remove('dark','sepia','sand');
+  if (t !== 'light') document.body.classList.add(t);
+  document.querySelectorAll('.th-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+}
+function applyFont(k) {
+  S.fontKey = k; loadFont(k);
+  document.documentElement.style.setProperty('--font', FONT_CSS[k]);
+  D.fontSel.value = k;
+}
+function applySize(px) {
+  S.fontSize = px;
+  document.documentElement.style.setProperty('--size', px+'px');
+  D.fontVal.textContent = px+'px';
+}
+function applyLH(v) {
+  S.lineHeight = v;
+  document.documentElement.style.setProperty('--lh', v);
+  D.lhV.textContent = parseFloat(v).toFixed(1);
+  D.lhR.value = v;
+}
+function saveSett() { stor(SETT_K, { theme:S.theme, fontKey:S.fontKey, fontSize:S.fontSize, lineHeight:S.lineHeight }); }
+function loadSett() {
+  const s = read(SETT_K, {});
+  applyTheme(s.theme    || 'light');
+  applyFont (s.fontKey  || 'amiri');
+  applySize (s.fontSize || 18);
+  applyLH   (s.lineHeight || 2);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANELS
 ══════════════════════════════════════════════════════════ */
 let openP = null;
 function showPanel(p) {
@@ -516,114 +586,79 @@ function hidePanel() {
   document.body.style.overflow = '';
 }
 
-function initFeedback() {
-  const form   = document.getElementById('feedback-form');
-  const status = document.getElementById('fb-status');
-  if (!form) return;
-
-  /* Destination assembled in JS at runtime — not visible as plain text */
-  const _e = ['m','a','f','.','b','d','c','@','g','m','a','i','l','.','c','o','m'].join('');
-  const _ep = btoa(_e);
-
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    const name = (document.getElementById('fb-name').value || '').trim();
-    const msg  = document.getElementById('fb-msg').value.trim();
-    if (!msg) {
-      status.style.color = 'var(--accent)';
-      status.textContent = 'يُرجى كتابة ملاحظتك أولاً.';
-      return;
-    }
-    const btn = form.querySelector('[type=submit]');
-    btn.disabled = true;
-    status.style.color = 'var(--muted)';
-    status.textContent = 'جارٍ الإرسال…';
-    try {
-      const payload = {
-        _subject: 'ملاحظة — بأسمائه نحيا',
-        name: name || 'زائر',
-        message: msg,
-        _captcha: 'false',
-        _template: 'table'
-      };
-      const res = await fetch('https://formsubmit.co/ajax/' + atob(_ep), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      const json = await res.json().catch(() => ({}));
-      if (res.ok && json.success !== false) {
-        status.style.color = '#2e7d32';
-        status.innerHTML =
-          'شكراً! وصلت ملاحظتك بنجاح ✓<br>' +
-          '<small style="color:var(--muted);font-size:.78rem">' +
-          'إذا كانت هذه أول مرة ترسل فيها ملاحظة، ابحث في صندوق بريدك عن رسالة تفعيل ' +
-          'من FormSubmit واضغط الرابط بداخلها.</small>';
-        form.reset();
-      } else {
-        throw new Error('fail');
-      }
-    } catch(_) {
-      status.style.color = 'var(--accent)';
-      const _fbEmail = atob(_ep);
-      status.innerHTML =
-        'حدث خطأ في الإرسال. ' +
-        '<a href="mailto:' + _fbEmail + '?subject=' + encodeURIComponent('ملاحظة — بأسمائه نحيا') +
-        '&body=' + encodeURIComponent((document.getElementById('fb-msg').value||'')) + '" ' +
-        'style="color:var(--accent)">أرسل بريداً مباشراً</a> بدلاً من ذلك.';
-    } finally {
-      btn.disabled = false;
-    }
+/* ══════════════════════════════════════════════════════════
+   NAMES LIST (flat, no categories)
+══════════════════════════════════════════════════════════ */
+function buildNames() {
+  const allNames = PARTS.flatMap(p => p.names.map(n => ({ ...n, partId:p.id, partTitle:p.title })));
+  D.nameL.innerHTML = allNames.map(n =>
+    `<button class="name-btn" data-pid="${n.partId}" data-chunk="${n.chunk}" type="button">
+       ${n.ar}<small>${n.partTitle}</small>
+     </button>`
+  ).join('');
+  D.nameL.addEventListener('click', e => {
+    const b = e.target.closest('.name-btn');
+    if (!b) return;
+    hidePanel();
+    goToName(+b.dataset.pid, +b.dataset.chunk, b.querySelector('small') ? b.childNodes[0].textContent.trim() : '');
   });
+}
+function markActive(partId, chunkNum) {
+  document.querySelectorAll('.name-btn').forEach(b =>
+    b.classList.toggle('active', +b.dataset.pid === partId && +b.dataset.chunk === chunkNum));
 }
 
 /* ══════════════════════════════════════════════════════════
-   CHUNK FETCHER  (cache-first, ~185 KB per chunk)
+   FULL-PART FETCH  (chapters/partN-full.html — one file per part)
+   Each file is a raw HTML fragment with the complete part content.
+   Browser caches it after first load so repeat visits are instant.
 ══════════════════════════════════════════════════════════ */
-const chunkCache = {};
+const fullCache = {};
+async function fetchFull(part) {
+  if (fullCache[part.id]) return fullCache[part.id];
 
-async function fetchChunk(part, num) {
-  const key = `${part.id}-${num}`;
-  if (chunkCache[key] !== undefined) return chunkCache[key];
-  const url = `${part.base}/chunk-${String(num).padStart(3,'0')}.html`;
+  /* (A) Self-contained mode — if this page has the part's content
+         embedded inline (<template id="inline-part-data" data-part-id="N">)
+         use it directly. Zero network, works on file:// and GitHub Pages. */
+  const inlineTpl = document.getElementById('inline-part-data');
+  if (inlineTpl && +inlineTpl.dataset.partId === part.id) {
+    const html = inlineTpl.innerHTML;
+    fullCache[part.id] = html;
+    return html;
+  }
+
+  /* (B) Hub mode — fall back to fetching the shared chapter file.    */
+  const url = part.base + '-full.html';
   try {
     const r = await fetch(url, { cache: 'force-cache' });
-    if (!r.ok) { chunkCache[key] = null; return null; }
+    if (!r.ok) { fullCache[part.id] = null; return null; }
     const html = await r.text();
-    chunkCache[key] = html;
+    fullCache[part.id] = html;
     return html;
-  } catch(_) { chunkCache[key] = null; return null; }
+  } catch(_) { fullCache[part.id] = null; return null; }
 }
 
-/* Silently prefetch a chunk into cache */
-function prefetchChunk(part, num) {
-  if (num < 1 || num > part.count) return;
-  const key = `${part.id}-${num}`;
-  if (chunkCache[key] !== undefined) return;
-  fetch(`${part.base}/chunk-${String(num).padStart(3,'0')}.html`, { cache: 'force-cache', priority:'low' })
-    .catch(() => {});
-}
-
-/* Prefetch adjacent parts' first chunks for instant switching */
+/* Warm the browser's HTTP cache for adjacent parts so switching to
+   the next/previous part feels instant. Low-priority, runs when idle.
+   Each part is warmed at most once per session.                      */
 const warmedParts = new Set();
+function prefetchPart(id) {
+  if (warmedParts.has(id)) return;
+  const part = PARTS.find(p => p.id === id);
+  if (!part) return;
+  warmedParts.add(id);
+  // In self-contained mode, warm the sibling part HTML (partN.html) instead
+  // of the shared chapter fragment (which may not even be deployed).
+  const inlineTpl = document.getElementById('inline-part-data');
+  const url = inlineTpl ? `part${id}.html` : part.base + '-full.html';
+  const run = () => fetch(url, { cache: 'force-cache', priority: 'low' }).catch(() => {});
+  if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 });
+  else setTimeout(run, 800);
+}
 function prefetchAdjacent(currentId) {
-  [currentId - 1, currentId + 1].forEach(id => {
-    if (warmedParts.has(id)) return;
-    const part = PARTS.find(p => p.id === id);
-    if (!part) return;
-    warmedParts.add(id);
-    const run = () => {
-      fetch(`part${id}.html`, { cache:'force-cache', priority:'low' }).catch(()=>{});
-      prefetchChunk(part, 1);
-    };
-    if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout:3000 });
-    else setTimeout(run, 1000);
-  });
+  [currentId - 1, currentId + 1, currentId + 2].forEach(prefetchPart);
 }
 
-/* ══════════════════════════════════════════════════════════
-   LAYOUT FIXERS
-══════════════════════════════════════════════════════════ */
 function fixImages(root) {
   root.querySelectorAll('img').forEach(img => {
     const src = img.getAttribute('src') || '';
@@ -635,28 +670,22 @@ function fixImages(root) {
 function fixLayout() {
   const c = D.content;
 
-  /* 1. Convert absolute-positioned Word artifacts to relative */
+  // 1. Remove Word absolute positions that break flow
   c.querySelectorAll('[style*="position:absolute"],[style*="position: absolute"]').forEach(el => {
     el.style.position = 'relative';
     el.style.left = '';
     el.style.top  = '';
-    el.style.zIndex = '';        /* clear massive Word z-index values */
-    el.style.marginTop = '';
-    el.style.marginLeft = '';
   });
 
-  /* 2. Zero out any remaining huge z-index values (z > 100 is a Word artifact).
-        These create invisible overlays that block clicks on the topbar/buttons. */
-  c.querySelectorAll('[style*="z-index"]').forEach(el => {
-    const zi = parseInt(el.style.zIndex, 10);
-    if (!isNaN(zi) && zi > 100) el.style.zIndex = '';
-  });
-
-  /* 3. Fix white-text-on-white-background from Word tables */
+  // 2. Fix "white text on white background" from Word's coloured-border tables.
+  //    When tables render correctly the cells have coloured bg so white text is fine;
+  //    if the table lost its bg for any reason the text becomes invisible.
+  //    We never want pure-white text on our light page bg, so we strip it.
   c.querySelectorAll('[style]').forEach(el => {
     const s = el.style;
     const col = s.color;
     if (col && (col === 'white' || col === '#ffffff' || col === 'rgb(255, 255, 255)')) {
+      // Only clear it if the element itself has no dark background
       const bg = s.backgroundColor;
       const hasDarkBg = bg && bg !== '' && bg !== 'transparent' &&
                         bg !== 'rgba(0, 0, 0, 0)' && bg !== 'white' &&
@@ -665,7 +694,7 @@ function fixLayout() {
     }
   });
 
-  /* 4. Wrap tables for horizontal scroll */
+  // 3. Wrap tables for horizontal scroll without breaking display:table model
   c.querySelectorAll('table').forEach(tbl => {
     if (tbl.parentElement && tbl.parentElement.classList.contains('tbl-wrap')) return;
     const wrap = document.createElement('div');
@@ -673,49 +702,37 @@ function fixLayout() {
     tbl.parentNode.insertBefore(wrap, tbl);
     wrap.appendChild(tbl);
   });
+
+  fixImages(c);
 }
 
 /* ══════════════════════════════════════════════════════════
-   NAME HEADING FINDER
+   FIND NAME HEADING in loaded content (for scroll target)
 ══════════════════════════════════════════════════════════ */
 function normalize(s) {
   return s
-    .replace(/[\u064B-\u065F\u0670]/g, '')
-    .replace(/[\u0671أإآا]/g, 'ا')
+    .replace(/[\u064B-\u065F\u0670]/g, '')   // strip tashkeel (NOT U+0671 wasla-alef)
+    .replace(/[\u0671أإآا]/g, 'ا')           // normalise alef variants incl. wasla (ٱ)
     .replace(/[()（）\[\]]/g, '')
     .replace(/\s+/g, '');
 }
 
 function findNameHeading(nameAr) {
   const target = normalize(nameAr);
+  // Check only first word/word pair for robustness
   const targetShort = target.slice(0, 6);
-  for (const el of D.content.querySelectorAll('h1,h2,h3,h4')) {
+
+  const headings = D.content.querySelectorAll('h1,h2,h3,h4');
+  for (const el of headings) {
     const txt = normalize(el.textContent || '');
-    if (txt.includes(target) || (targetShort.length > 3 && txt.includes(targetShort))) return el;
+    if (txt.includes(target) || txt.includes(targetShort)) return el;
   }
+  // Fall back: search paragraphs that might contain the name as bold heading
   for (const el of D.content.querySelectorAll('p')) {
     const txt = normalize(el.textContent || '');
-    if (target.length > 4 && txt === target) return el;
+    if (txt === target || (target.length > 4 && txt === target)) return el;
   }
   return null;
-}
-
-/* Detect which name the reader is currently on, based on scroll */
-function detectCurrentName() {
-  if (!S.part) return;
-  const mid = window.scrollY + window.innerHeight * 0.3;
-  let best = S.part.names[0];
-  for (const n of S.part.names) {
-    const el = findNameHeading(n.ar);
-    if (el) {
-      const top = el.getBoundingClientRect().top + window.scrollY;
-      if (top <= mid) { best = n; }
-    }
-  }
-  if (best) {
-    S.currentChunk  = best.chunk;
-    S.currentNameAr = best.ar;
-  }
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -723,7 +740,7 @@ function detectCurrentName() {
 ══════════════════════════════════════════════════════════ */
 function updateProg() {
   const total = document.documentElement.scrollHeight - window.innerHeight;
-  D.prog.style.width = (total > 0 ? Math.min(100, window.scrollY / total * 100) : 0).toFixed(1) + '%';
+  D.prog.style.width = (total > 0 ? Math.min(100, window.scrollY/total*100) : 0).toFixed(1)+'%';
 }
 function updateBadge() {
   if (!S.part) return;
@@ -732,20 +749,16 @@ function updateBadge() {
 function flashSave() {
   D.saveInd.classList.add('show');
   clearTimeout(D.saveInd._t);
-  D.saveInd._t = setTimeout(() => D.saveInd.classList.remove('show'), 2000);
+  D.saveInd._t = setTimeout(() => D.saveInd.classList.remove('show'), 2200);
 }
 function scheduleSave() {
   clearTimeout(S.saveTimer);
-  S.saveTimer = setTimeout(() => {
-    detectCurrentName();
-    saveGlobal();
-    flashSave();
-  }, 2500);
+  S.saveTimer = setTimeout(() => { saveGlobal(); flashSave(); }, 2500);
 }
-function showLoadBar(cur, tot) {
+function showLoadBar(current, total) {
   D.lbWrap.classList.add('show');
-  D.lbTxt.textContent = `جارٍ التحميل…`;
-  D.lbFill.style.width = (tot > 0 ? Math.round(cur / tot * 100) : 0) + '%';
+  D.lbTxt.textContent = `جارٍ التحميل ${current} / ${total}…`;
+  D.lbFill.style.width = (total > 0 ? Math.round(current/total*100) : 0)+'%';
 }
 function hideLoadBar() {
   D.lbWrap.classList.remove('show');
@@ -753,51 +766,38 @@ function hideLoadBar() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   CORE: PROGRESSIVE CHUNK LOADER
-   Shows the first chunk within ~200 ms, loads the rest
-   silently in the background.
+   CORE: LOAD FULL PART FILE  (chapters/partN-full.html)
+   One HTTP request per part. Browser caches the file so
+   navigating between names in the same part is instant.
 ══════════════════════════════════════════════════════════ */
-function appendChunk(wrapper, html, num) {
-  const div = document.createElement('div');
-  div.className = 'chunk';
-  div.dataset.chunk = num;
-  div.innerHTML = html;
-  fixImages(div);
-  wrapper.appendChild(div);
-}
-
-async function loadPart(part, startChunk, scrollToName) {
+async function loadPart(part, _targetChunk, scrollToName, restoreScrollY) {
   S.part = part;
-  S.nextChunk = Math.max(1, startChunk || 1);
+  S.maxC = part.count;   // full file = all chunks loaded
   S.loadingNext = false;
-  S.currentChunk  = S.nextChunk;
-  S.currentNameAr = scrollToName || '';
 
   D.content.innerHTML = '';
   D.spinner.textContent = '';
-  hideLoadBar();
+  D.lbTxt.textContent = 'جارٍ تحميل الجزء…';
+  D.lbFill.style.width = '0%';
+  D.lbWrap.classList.add('show');
   updateBadge();
 
-  /* Build content wrapper */
-  const wrapper = document.createElement('div');
-  wrapper.className = 'chunks-wrapper';
-  wrapper.setAttribute('data-part', part.id);
-  D.content.appendChild(wrapper);
+  const html = await fetchFull(part);
 
-  /* ── Fetch & display first chunk immediately ── */
-  showLoadBar(1, 2);
-  const firstHtml = await fetchChunk(part, S.nextChunk);
-  hideLoadBar();
+  D.lbWrap.classList.remove('show');
 
-  if (firstHtml === null) {
+  if (!html || !html.trim()) {
+    // Detect local file:// — browsers block fetch() on local files
     if (location.protocol === 'file:') {
       D.content.innerHTML =
         '<div class="msg">' +
-        '<h2>لا يمكن التشغيل من ملف محلي</h2>' +
-        '<p>يعمل الموقع بشكل كامل بعد رفعه على GitHub Pages، ' +
-        'أو شغّله محلياً بخادم بسيط:</p>' +
-        '<p style="direction:ltr;text-align:left;background:#f4ebe0;padding:.7rem 1rem;border-radius:8px;font-family:monospace;font-size:.88rem;margin-top:.8rem;display:inline-block">python3 -m http.server 8000</p>' +
-        '<p>ثم افتح <code>http://localhost:8000/</code></p></div>';
+          '<h2>لا يمكن التشغيل من ملف محلي</h2>' +
+          '<p>المتصفحات تمنع تحميل الملفات عبر <code>file://</code> لأسباب أمنية. ' +
+          'يعمل الموقع بشكل كامل بعد رفعه على GitHub Pages، ' +
+          'أو يمكنك تشغيله محلياً بخادم بسيط:</p>' +
+          '<p style="direction:ltr;text-align:left;background:#f4ebe0;padding:.7rem 1rem;border-radius:8px;font-family:monospace;font-size:.88rem;margin-top:.8rem;display:inline-block">python3 -m http.server 8000</p>' +
+          '<p>ثم افتح <code>http://localhost:8000/</code></p>' +
+        '</div>';
       return;
     }
     D.content.innerHTML =
@@ -806,109 +806,97 @@ async function loadPart(part, startChunk, scrollToName) {
     return;
   }
 
-  appendChunk(wrapper, firstHtml, S.nextChunk);
-  S.nextChunk++;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'chunks-wrapper';
+  wrapper.setAttribute('data-part', part.id);
+  wrapper.innerHTML = html;          // full file parsed in one shot
+  D.content.appendChild(wrapper);
+
   fixLayout();
   prefetchAdjacent(part.id);
 
-  /* ── Scroll to name heading ── */
+  // Restore exact scroll position (continue reading)
+  if (typeof restoreScrollY === 'number') {
+    await new Promise(r => requestAnimationFrame(r));
+    await new Promise(r => setTimeout(r, 80));
+    window.scrollTo({ top: restoreScrollY, behavior: 'instant' });
+    updateProg();
+    return;
+  }
+
+  // Scroll to the name heading
   if (scrollToName) {
     await new Promise(r => requestAnimationFrame(r));
     await new Promise(r => setTimeout(r, 80));
     const el = findNameHeading(scrollToName);
     if (el) {
       const y = el.getBoundingClientRect().top + window.scrollY - 90;
-      const targetY = Math.max(0, y + S.restoreScrollOffset);
-      S.restoreScrollOffset = 0;
-      window.scrollTo({ top: targetY, behavior: 'instant' });
-      /* Store target so loadRemaining can re-scroll if content was too short */
-      S.restoreTargetY = targetY;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
-  } else {
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    updateProg();
+    return;
   }
+
+  window.scrollTo({ top: 0, behavior: 'instant' });
   updateProg();
-
-  /* ── Load remaining chunks in background ── */
-  loadRemaining(part, wrapper);
-}
-
-async function loadRemaining(part, wrapper) {
-  if (S.loadingNext) return;
-  S.loadingNext = true;
-  while (S.nextChunk <= part.count && S.part === part) {
-    const html = await fetchChunk(part, S.nextChunk);
-    if (html === null) break;
-    appendChunk(wrapper, html, S.nextChunk);
-    S.nextChunk++;
-    /* Re-apply restore target now that page is taller */
-    if (S.restoreTargetY >= 0) {
-      const maxY = document.documentElement.scrollHeight - window.innerHeight;
-      if (S.restoreTargetY <= maxY + 10) {
-        window.scrollTo({ top: S.restoreTargetY, behavior: 'instant' });
-        S.restoreTargetY = -1;
-      }
-    }
-    /* Yield to browser so scroll/input stays responsive */
-    await new Promise(r => setTimeout(r, 30));
-  }
-  if (S.part === part) fixLayout();
-  S.loadingNext = false;
 }
 
 /* ══════════════════════════════════════════════════════════
-   NAVIGATION
+   PUBLIC NAVIGATION HELPERS
 ══════════════════════════════════════════════════════════ */
+
+/** Navigate to a specific name (click from index or names panel) */
 async function goToName(partId, chunkNum, nameAr) {
   const part = PARTS.find(p => p.id === partId);
   if (!part) return;
 
-  /* If this page is for a different part, navigate there */
-  const tpl = document.getElementById('inline-part-data');
-  const thisPartId = tpl ? +tpl.dataset.partId : 0;
-  if (thisPartId && thisPartId !== partId) {
+  /* Self-contained mode: each partN.html only ships with ITS OWN content.
+     If the user clicks a name from a different part, navigate to that
+     part's dedicated page instead of trying to fetch.                   */
+  const inlineTpl = document.getElementById('inline-part-data');
+  if (inlineTpl && +inlineTpl.dataset.partId !== partId) {
     location.href = `part${partId}.html?start=${chunkNum}`;
     return;
   }
 
+  // Update URL without reload
   const url = new URL(location.href);
   url.searchParams.set('part',  partId);
   url.searchParams.set('start', chunkNum);
   url.searchParams.delete('restore');
   history.replaceState(null, '', url.toString());
 
-  S.currentChunk  = chunkNum;
-  S.currentNameAr = nameAr || '';
-  saveGlobal();
-  await loadPart(part, chunkNum, nameAr);
+  markActive(partId, chunkNum);
+  await loadPart(part, chunkNum, nameAr, null);
 }
 
+/** Restore last saved session */
 async function restoreSession(saved) {
   const part = PARTS.find(p => p.id === saved.partId);
   if (!part) return false;
 
-  /* If this page is for a different part, navigate there */
-  const tpl = document.getElementById('inline-part-data');
-  const thisPartId = tpl ? +tpl.dataset.partId : 0;
-  if (thisPartId && thisPartId !== saved.partId) {
-    location.href = `part${saved.partId}.html?start=${saved.chunkNum || 1}`;
-    return true;
-  }
+  D.content.innerHTML = `<div class="msg"><h2>جارٍ استعادة موضع القراءة…</h2></div>`;
 
-  S.currentChunk  = saved.chunkNum || 1;
-  S.currentNameAr = saved.nameAr  || '';
-  S.restoreScrollOffset = saved.scrollOffset || 0;
-  await loadPart(part, saved.chunkNum || 1, saved.nameAr || null);
+  const url = new URL(location.href);
+  url.searchParams.set('part', saved.partId);
+  url.searchParams.set('start', saved.maxChunk);
+  url.searchParams.set('restore', '1');
+  history.replaceState(null, '', url.toString());
+
+  markActive(saved.partId, saved.maxChunk);
+  await loadPart(part, Math.min(saved.maxChunk, part.count), null, saved.scrollY);
   return true;
 }
 
+/** "Continue Reading" button */
 async function continueReading() {
   const saved = read(GLOB_K);
   if (saved && saved.partId) {
     await restoreSession(saved);
   } else {
+    // First visit — open with the first name الرَّحْمٰن
     await goToName(1, 4, 'الرَّحْمٰن');
   }
 }
@@ -923,14 +911,16 @@ function onScroll() {
   requestAnimationFrame(() => {
     ticking = false;
     updateProg();
+
+    // Auto-hide topbar on scroll-down, reveal on scroll-up
     const y   = window.scrollY;
-    if (S.restoreTargetY >= 0 && Math.abs(y - S.restoreTargetY) > 50) S.restoreTargetY = -1;
     const dir = y > S.lastY ? 1 : -1;
     if (dir !== S.scrollDir) {
       S.scrollDir = dir;
       D.topbar.classList.toggle('hidden', dir === 1 && y > 100);
     }
     S.lastY = y;
+
     scheduleSave();
   });
 }
@@ -939,21 +929,30 @@ function onScroll() {
    WIRE EVENTS
 ══════════════════════════════════════════════════════════ */
 function wireEvents() {
-  if (D.btnFB) D.btnFB.addEventListener('click', () => showPanel(D.feedbackP));
+  D.btnN.addEventListener('click', () => showPanel(D.namesP));
+  D.btnS.addEventListener('click', () => showPanel(D.setP));
   D.overlay.addEventListener('click', hidePanel);
-  const closeFB = g('close-feedback');
-  if (closeFB) closeFB.addEventListener('click', hidePanel);
+  g('close-names').addEventListener('click', hidePanel);
+  g('close-settings').addEventListener('click', hidePanel);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') hidePanel(); });
 
   D.btnC.addEventListener('click', continueReading);
 
-  window.addEventListener('scroll', onScroll, { passive: true });
+  document.querySelectorAll('.th-btn').forEach(b => {
+    b.addEventListener('click', () => { applyTheme(b.dataset.t); saveSett(); });
+  });
+  D.fontSel.addEventListener('change', () => { applyFont(D.fontSel.value); saveSett(); });
+  D.fontInc.addEventListener('click', () => { applySize(Math.min(32, S.fontSize+1)); saveSett(); });
+  D.fontDec.addEventListener('click', () => { applySize(Math.max(12, S.fontSize-1)); saveSett(); });
+  D.lhR.addEventListener('input', () => { applyLH(D.lhR.value); saveSett(); });
+  D.btnR.addEventListener('click', () => {
+    applyTheme('light'); applyFont('amiri'); applySize(18); applyLH(2); saveSett();
+  });
 
-  const forceSave = () => {
-    clearTimeout(S.saveTimer);
-    detectCurrentName();
-    saveGlobal();
-  };
+  window.addEventListener('scroll', onScroll, { passive:true });
+
+  // Force-save before leaving
+  const forceSave = () => { clearTimeout(S.saveTimer); saveGlobal(); };
   window.addEventListener('pagehide',           forceSave);
   window.addEventListener('beforeunload',       forceSave);
   document.addEventListener('visibilitychange', () => { if (document.hidden) forceSave(); });
@@ -961,73 +960,69 @@ function wireEvents() {
   window.addEventListener('resize', () => {
     if (window.innerWidth > 820) hidePanel();
     updateProg();
-  }, { passive: true });
+  }, { passive:true });
 }
 
 /* ══════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════ */
 async function init() {
+  loadSett();
+  buildNames();
   wireEvents();
-  initFeedback();
 
-  const p      = new URLSearchParams(location.search);
-  const pParam = +p.get('part')  || 0;
-  const start  = +p.get('start') || 0;
+  const p       = new URLSearchParams(location.search);
+  const partId  = +p.get('part')  || 0;
+  const start   = +p.get('start') || 0;
+  const restore = p.has('restore');
 
-  /* Which part page is this? (data-part-id on the empty template) */
-  const tpl        = document.getElementById('inline-part-data');
-  const thisPartId = tpl ? +tpl.dataset.partId : 0;
+  // Explicit restore request
+  if (restore && partId && start) {
+    const saved = read(GLOB_K) || read(SK+'part'+partId);
+    if (saved && saved.partId) { await restoreSession(saved); return; }
+  }
 
-  /* Direct name navigation from index.html: ?start=N (no ?part= needed) */
-  const targetPart = pParam || thisPartId;
-  if (targetPart && start) {
-    const part      = PARTS.find(q => q.id === targetPart);
+  // Direct name navigation from index (part + start chunk)
+  if (partId && start) {
+    // Find the name text for this part/chunk so we can scroll to heading
+    const part = PARTS.find(p => p.id === partId);
     const nameEntry = part && part.names.find(n => n.chunk === start);
-    const nameAr    = nameEntry ? nameEntry.ar : null;
-
-    /* If the user was previously reading this exact name, restore their scroll
-       position within the name (not just the heading) */
-    const _sv = read(SK + 'part' + targetPart) || read(GLOB_K);
-    if (_sv && _sv.partId === targetPart && _sv.nameAr === nameAr && (_sv.scrollOffset || 0) > 20) {
-      S.restoreScrollOffset = _sv.scrollOffset;
-    }
-
-    await goToName(targetPart, start, nameAr);
+    const nameAr = nameEntry ? nameEntry.ar : null;
+    markActive(partId, start);
+    await goToName(partId, start, nameAr);
     return;
   }
 
-  /* Part page opened directly (no start param) — restore saved position */
-  if (thisPartId) {
-    const saved = read(SK + 'part' + thisPartId);
-    if (saved && (saved.chunkNum || saved.maxChunk)) {
-      const chk = saved.chunkNum || saved.maxChunk;
-      await restoreSession({ ...saved, partId: thisPartId, chunkNum: chk });
-      return;
-    }
-    await goToName(thisPartId, 1, null);
+  // Part only — check saved position for that part
+  if (partId) {
+    const saved = read(SK+'part'+partId);
+    if (saved && saved.maxChunk) { await restoreSession({ ...saved, partId }); return; }
+    const part = PARTS.find(p => p.id === partId);
+    if (part) { await goToName(partId, 1, null); }
     return;
   }
 
-  /* No URL params, no part context — auto-restore global session */
+  // No URL params — auto-restore global session
   const glob = read(GLOB_K);
   if (glob && glob.partId) { await restoreSession(glob); return; }
 
-  /* Very first visit */
+  // Very first visit — start at الرَّحْمٰن
   await goToName(1, 4, 'الرَّحْمٰن');
 }
 
 init();
 
 /* ══════════════════════════════════════════════════════════
-   SERVICE WORKER
+   SERVICE WORKER  (offline cache → instant repeat visits)
 ══════════════════════════════════════════════════════════ */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).catch(() => {});
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .catch(() => {});
   });
 }
 
 })();
 </script>
-</body></html>
+</body>
+</html>
