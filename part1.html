@@ -477,6 +477,7 @@ const S = {
   lastY: 0, scrollDir: 0,
   saveTimer: null,
   restoreScrollOffset: 0,
+  restoreTargetY: -1,
 };
 
 /* ══════════════════════════════════════════════════════════
@@ -520,12 +521,11 @@ function initFeedback() {
   const status = document.getElementById('fb-status');
   if (!form) return;
 
-  /* Email assembled in JS — never appears as plain text in HTML source */
-  const _u = ['m','a','f','.','b','d','c'].join('');
-  const _d = ['g','m','a','i','l','.','c','o','m'].join('');
-  const _e = _u + '@' + _d;
+  /* Destination assembled in JS at runtime — not visible as plain text */
+  const _e = ['m','a','f','.','b','d','c','@','g','m','a','i','l','.','c','o','m'].join('');
+  const _ep = btoa(_e);
 
-  form.addEventListener('submit', e => {
+  form.addEventListener('submit', async e => {
     e.preventDefault();
     const name = (document.getElementById('fb-name').value || '').trim();
     const msg  = document.getElementById('fb-msg').value.trim();
@@ -534,18 +534,37 @@ function initFeedback() {
       status.textContent = 'يُرجى كتابة ملاحظتك أولاً.';
       return;
     }
-
-    const bodyParts = [];
-    if (name) bodyParts.push('الاسم: ' + name + '\n');
-    bodyParts.push('الملاحظة:\n' + msg);
-
-    const subject  = encodeURIComponent('ملاحظة — بأسمائه نحيا');
-    const body     = encodeURIComponent(bodyParts.join('\n'));
-    window.location.href = 'mailto:' + _e + '?subject=' + subject + '&body=' + body;
-
-    status.style.color   = '#2e7d32';
-    status.textContent   = 'شكراً! سيفتح تطبيق البريد لإرسال ملاحظتك ✓';
-    form.reset();
+    const btn = form.querySelector('[type=submit]');
+    btn.disabled = true;
+    status.style.color = 'var(--muted)';
+    status.textContent = 'جارٍ الإرسال…';
+    try {
+      const payload = {
+        _subject: 'ملاحظة — بأسمائه نحيا',
+        name: name || 'زائر',
+        message: msg,
+        _captcha: 'false',
+        _template: 'table'
+      };
+      const res = await fetch('https://formsubmit.co/ajax/' + atob(_ep), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json().catch(() => ({}));
+      if (res.ok && json.success !== false) {
+        status.style.color = '#2e7d32';
+        status.textContent = 'شكراً! وصلت ملاحظتك بنجاح ✓';
+        form.reset();
+      } else {
+        throw new Error('fail');
+      }
+    } catch(_) {
+      status.style.color = 'var(--accent)';
+      status.textContent = 'حدث خطأ في الإرسال. يُرجى المحاولة مرة أخرى.';
+    } finally {
+      btn.disabled = false;
+    }
   });
 }
 
@@ -790,8 +809,11 @@ async function loadPart(part, startChunk, scrollToName) {
     const el = findNameHeading(scrollToName);
     if (el) {
       const y = el.getBoundingClientRect().top + window.scrollY - 90;
-      window.scrollTo({ top: Math.max(0, y + S.restoreScrollOffset), behavior: 'instant' });
+      const targetY = Math.max(0, y + S.restoreScrollOffset);
       S.restoreScrollOffset = 0;
+      window.scrollTo({ top: targetY, behavior: 'instant' });
+      /* Store target so loadRemaining can re-scroll if content was too short */
+      S.restoreTargetY = targetY;
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
@@ -812,6 +834,14 @@ async function loadRemaining(part, wrapper) {
     if (html === null) break;
     appendChunk(wrapper, html, S.nextChunk);
     S.nextChunk++;
+    /* Re-apply restore target now that page is taller */
+    if (S.restoreTargetY >= 0) {
+      const maxY = document.documentElement.scrollHeight - window.innerHeight;
+      if (S.restoreTargetY <= maxY + 10) {
+        window.scrollTo({ top: S.restoreTargetY, behavior: 'instant' });
+        S.restoreTargetY = -1;
+      }
+    }
     /* Yield to browser so scroll/input stays responsive */
     await new Promise(r => setTimeout(r, 30));
   }
@@ -885,6 +915,7 @@ function onScroll() {
     ticking = false;
     updateProg();
     const y   = window.scrollY;
+    if (S.restoreTargetY >= 0 && Math.abs(y - S.restoreTargetY) > 50) S.restoreTargetY = -1;
     const dir = y > S.lastY ? 1 : -1;
     if (dir !== S.scrollDir) {
       S.scrollDir = dir;

@@ -12,7 +12,7 @@
 /* v3 — switched from self-contained 5-7 MB partN.html pages to
    lightweight 39 KB shells + on-demand chunk loading.
    Cache key bumped so existing visitors discard the old cache.   */
-const CACHE_VERSION = 'asma-v3-2026-04-24';
+const CACHE_VERSION = 'asma-v4-2026-04-24';
 
 /* Only precache the shell files — tiny and needed for every visit */
 const SHELL = [
