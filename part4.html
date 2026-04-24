@@ -176,11 +176,12 @@
     }
     #names-panel    { right: 0; transform: translateX(110%); }
     #settings-panel { left: 0;  transform: translateX(-110%); }
+    #feedback-panel { right: 0; transform: translateX(110%); }
     .panel.open     { transform: translateX(0); }
 
     .panel h3 { color: var(--accent); font-size: 1.05rem; margin-bottom: .9rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border); }
 
-    .panel-close { float: left; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--muted); padding: .2rem .4rem; }
+    .panel-close { float: left; background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--muted); padding: .6rem .8rem; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; }
     #settings-panel .panel-close { float: right; }
 
     /* Names list inside panel — flat, no categories */
