@@ -177,6 +177,7 @@
     #names-panel    { right: 0; transform: translateX(110%); }
     #settings-panel { left: 0;  transform: translateX(-110%); }
     #feedback-panel { right: 0; transform: translateX(110%); }
+    #feedback-panel.open { transform: translateX(0); }
     .panel.open     { transform: translateX(0); }
 
     .panel h3 { color: var(--accent); font-size: 1.05rem; margin-bottom: .9rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border); }
@@ -445,10 +446,19 @@ function read(k, d=null) { try { const r=localStorage.getItem(k); return r?JSON.
 
 function saveGlobal() {
   if (!S.part) return;
+  let scrollOffset = 0;
+  if (S.currentNameAr) {
+    const el = findNameHeading(S.currentNameAr);
+    if (el) {
+      const nameTop = el.getBoundingClientRect().top + window.scrollY - 90;
+      scrollOffset = Math.max(0, window.scrollY - nameTop);
+    }
+  }
   const rec = {
     partId:   S.part.id,
     chunkNum: S.currentChunk,
     nameAr:   S.currentNameAr,
+    scrollOffset,
     ts:       Date.now()
   };
   stor(GLOB_K, rec);
@@ -466,6 +476,7 @@ const S = {
   loadingNext: false,
   lastY: 0, scrollDir: 0,
   saveTimer: null,
+  restoreScrollOffset: 0,
 };
 
 /* ══════════════════════════════════════════════════════════
@@ -779,7 +790,8 @@ async function loadPart(part, startChunk, scrollToName) {
     const el = findNameHeading(scrollToName);
     if (el) {
       const y = el.getBoundingClientRect().top + window.scrollY - 90;
-      window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
+      window.scrollTo({ top: Math.max(0, y + S.restoreScrollOffset), behavior: 'instant' });
+      S.restoreScrollOffset = 0;
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
@@ -848,6 +860,7 @@ async function restoreSession(saved) {
 
   S.currentChunk  = saved.chunkNum || 1;
   S.currentNameAr = saved.nameAr  || '';
+  S.restoreScrollOffset = saved.scrollOffset || 0;
   await loadPart(part, saved.chunkNum || 1, saved.nameAr || null);
   return true;
 }
