@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بأسمائه نحيا — القارئ</title>
+  <meta name="description" content="قارئ كتاب بأسمائه نحيا — فقه الحب والتقوى في الأسماء الحسنى">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    /* Uthmanic font for Quran verses */
+    @font-face {
+      font-family: "Uthmanic";
+      src: url("assets/uthmanic-hafs.otf") format("opentype");
+      font-display: swap;
+    }
+
+    :root {
+      --bg:      #f8f4ef;
+      --surface: #ffffff;
+      --text:    #1c1007;
+      --muted:   #6b5d4f;
+      --accent:  #8b3a12;
+      --accent2: #d4a574;
+      --border:  #e8dfd6;
+      --shadow:  0 6px 22px rgba(0,0,0,.07);
+      --radius:  14px;
+      --font:    Georgia,"Times New Roman",serif;
+      --font-ui: system-ui,sans-serif;
+      --size:    18px;
+      --lh:      2;
+      --panel-w: 300px;
+    }
+    body.dark  { --bg:#111317; --surface:#1a1f27; --text:#f0e5d8; --muted:#baa58f; --accent:#e2a05f; --accent2:#be7f40; --border:#2d3440; --shadow:0 8px 28px rgba(0,0,0,.38); }
+    body.sepia { --bg:#f0e7d8; --surface:#fbf4e6; --text:#3d2a18; --muted:#6d553f; --accent:#915c2e; --accent2:#bb8a58; --border:#dfd0bc; }
+    body.sand  { --bg:#ede2bd; --surface:#fbf6df; --text:#332b1f; --muted:#6f5e45; --accent:#8a6d42; --accent2:#af8f60; --border:#d8c49a; }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      font-size: var(--size);
+      line-height: var(--lh);
+      overflow-x: hidden;
+      transition: background .2s, color .2s;
+    }
+
+    /* ── PROGRESS BAR ─────────────────────────────────────────────────── */
+    #prog-track {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 3px; z-index: 600; pointer-events: none;
+    }
+    #prog-fill {
+      height: 100%; width: 0;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      transition: width .1s linear;
+    }
+
+    /* ── TOPBAR — sticky, auto-hides on scroll-down ───────────────────── */
+    #topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: .6rem; flex-wrap: wrap;
+      padding: .7rem 1.2rem;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      transition: transform .26s ease, background .2s, border-color .2s;
+    }
+    #topbar.hidden { transform: translateY(calc(-100% - 3px)); }
+
+    .brand { display: flex; flex-direction: column; line-height: 1.2; }
+    .brand-title { color: var(--accent); font-size: 1.18rem; font-weight: 700; }
+    .brand-sub   { color: var(--muted); font-family: var(--font-ui); font-size: .73rem; }
+
+    .ctrl-row { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: .46rem .82rem; min-height: 42px;
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--surface); color: var(--text);
+      font-family: var(--font-ui); font-size: .86rem;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+      transition: border-color .18s, box-shadow .18s;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover { border-color: var(--accent2); box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border-color: transparent; color: #fff;
+    }
+    .btn.primary:hover { opacity: .91; }
+
+    /* ── READING AREA ─────────────────────────────────────────────────── */
+    #wrap { max-width: 900px; margin: 0 auto; padding: 1.4rem 1rem 4rem; }
+
+    #content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      min-height: 60vh;
+      transition: background .2s, border-color .2s;
+    }
+
+    /* ── WORD/MSO NORMALISATION ───────────────────────────────────────── */
+    #content section + section {
+      border-top: 1px solid var(--border);
+      padding-top: 2rem; margin-top: 2rem;
+    }
+    #content p,
+    #content div,
+    #content h1,#content h2,#content h3,
+    #content h4,#content h5,#content h6,
+    #content ul,#content ol {
+      width: auto     !important;
+      max-width: 100% !important;
+      margin-left: 0  !important;
+      margin-right: 0 !important;
+    }
+    #content p {
+      line-height: var(--lh) !important;
+      margin-bottom: 1rem;
+      text-align: justify;
+      text-indent: 0 !important;
+      overflow-wrap: anywhere;
+    }
+    #content h1 { color: var(--accent); font-size: 1.55rem; margin: 1.3rem 0 .75rem; }
+    #content h2 { color: var(--accent); font-size: 1.22rem; margin: 1.1rem 0 .6rem; }
+    #content h3 { color: var(--accent); font-size: 1.05rem; margin: .9rem 0 .5rem; }
+    #content ul,#content ol { list-style-position: inside !important; padding-right: 1rem !important; margin-bottom: 1rem; }
+    #content li { margin-bottom: .35rem; text-indent: 0 !important; overflow-wrap: anywhere; }
+    #content blockquote { border-right: 3px solid var(--accent2); padding-right: 1rem; margin: 1rem 0; color: var(--muted); }
+    #content .MsoToc1,#content .MsoToc2 { width: auto !important; max-width: 100% !important; padding-right: .75rem !important; text-indent: 0 !important; white-space: normal !important; overflow-wrap: anywhere !important; tab-size: 0 !important; }
+    #content img    { max-width: 100% !important; height: auto !important; }
+    /* Tables: keep display:table so cell backgrounds/colours render correctly.
+       Horizontal scrolling is handled by .tbl-wrap added by fixLayout(). */
+    .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+    #content table  { max-width: 100% !important; border-collapse: collapse; }
+    #content .quran-quote,
+    #content .quran-quote * { font-family: "Uthmanic","Noto Naskh Arabic",Georgia,serif !important; letter-spacing: 0 !important; word-spacing: .04em; }
+
+    /* ── STATUS / LOADER ──────────────────────────────────────────────── */
+    .msg { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+    .msg h2 { color: var(--accent); margin-bottom: .6rem; }
+    .msg p  { font-family: var(--font-ui); font-size: .92rem; }
+
+    #load-bar-wrap {
+      display: none;
+      margin-bottom: 1rem;
+      font-family: var(--font-ui); font-size: .82rem;
+      color: var(--muted);
+    }
+    #load-bar-wrap.show { display: block; }
+    #load-bar-bg {
+      height: 4px; background: var(--border); border-radius: 2px;
+      overflow: hidden; margin-top: .4rem;
+    }
+    #load-bar-fill {
+      height: 100%; width: 0; background: var(--accent2); border-radius: 2px;
+      transition: width .18s ease;
+    }
+    #load-spinner { text-align: center; padding: 1rem; font-family: var(--font-ui); font-size: .82rem; color: var(--muted); }
+
+    /* ── PANELS ───────────────────────────────────────────────────────── */
+    .panel {
+      position: fixed; top: 0; height: 100vh; height: 100dvh;
+      width: var(--panel-w); overflow-y: auto;
+      overscroll-behavior: contain;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: var(--shadow); z-index: 200; padding: 1rem;
+      transition: transform .24s ease, background .2s, border-color .2s;
+    }
+    #names-panel    { right: 0; transform: translateX(110%); }
+    #settings-panel { left: 0;  transform: translateX(-110%); }
+    .panel.open     { transform: translateX(0); }
+
+    .panel h3 { color: var(--accent); font-size: 1.05rem; margin-bottom: .9rem; padding-bottom: .5rem; border-bottom: 1px solid var(--border); }
+
+    .panel-close { float: left; background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--muted); padding: .2rem .4rem; }
+    #settings-panel .panel-close { float: right; }
+
+    /* Names list inside panel — flat, no categories */
+    .name-btn {
+      display: block; width: 100%; text-align: right;
+      padding: .55rem .75rem; margin-bottom: .3rem;
+      background: none; border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-family: var(--font); font-size: .96rem;
+      cursor: pointer; min-height: 42px; touch-action: manipulation;
+      transition: background .14s, border-color .14s, color .14s;
+    }
+    .name-btn:hover, .name-btn.active {
+      background: color-mix(in srgb, var(--accent) 9%, transparent);
+      border-color: var(--accent2); color: var(--accent);
+    }
+    .name-btn small { display: block; font-family: var(--font-ui); font-size: .68rem; color: var(--muted); margin-top: .1rem; }
+
+    /* ── SETTINGS ─────────────────────────────────────────────────────── */
+    .s-row { margin-bottom: 1.1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+    .s-row:last-child { border-bottom: none; }
+    .s-label { display: block; font-family: var(--font-ui); font-size: .84rem; color: var(--muted); margin-bottom: .42rem; }
+    .theme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+    .th-btn { padding: .5rem .3rem; border: 2px solid transparent; border-radius: 8px; cursor: pointer; font-family: var(--font-ui); font-size: .82rem; text-align: center; min-height: 40px; touch-action: manipulation; transition: border-color .15s, transform .15s; }
+    .th-btn.active { border-color: var(--accent); transform: translateY(-1px); }
+    .th-btn[data-t="light"] { background:#f8f4ef; color:#1c1007; }
+    .th-btn[data-t="dark"]  { background:#1a1f27; color:#f0e5d8; }
+    .th-btn[data-t="sepia"] { background:#f0e7d8; color:#3d2a18; }
+    .th-btn[data-t="sand"]  { background:#ede2bd; color:#332b1f; }
+    select { width: 100%; padding: .48rem .6rem; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-family: var(--font-ui); font-size: .9rem; }
+    .num-row { display: flex; align-items: center; gap: .5rem; }
+    .num-val  { min-width: 48px; text-align: center; font-family: var(--font-ui); color: var(--muted); font-size: .84rem; }
+    .num-btn  { flex-shrink: 0; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+    input[type="range"] { width: 100%; }
+
+    /* ── OVERLAY ──────────────────────────────────────────────────────── */
+    #overlay { position: fixed; inset: 0; z-index: 190; background: rgba(0,0,0,.26); opacity: 0; pointer-events: none; transition: opacity .24s; }
+    #overlay.show { opacity: 1; pointer-events: auto; }
+
+    /* ── AUTOSAVE TOAST ───────────────────────────────────────────────── */
+    #save-ind { position: fixed; bottom: 1rem; left: 1rem; z-index: 500; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: .38rem .75rem; font-family: var(--font-ui); font-size: .73rem; color: var(--muted); opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s; pointer-events: none; }
+    #save-ind.show { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ───────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      #topbar { flex-direction: column; align-items: stretch; }
+      .ctrl-row { justify-content: center; }
+      #wrap { padding: .75rem .5rem 2.5rem; }
+      #content { padding: 1rem; border-radius: 10px; }
+      .panel { width: min(var(--panel-w), 90vw); }
+      .btn { flex: 1 1 auto; }
+    }
+    @media (max-width: 480px) {
+      .brand-title { font-size: 1.05rem; }
+      #content { padding: .85rem; }
+      .btn { font-size: .82rem; padding: .44rem .6rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="prog-track" aria-hidden="true"><div id="prog-fill"></div></div>
+
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-title">بأسمائه نحيا</span>
+      <span class="brand-sub" id="part-badge">جارٍ التحميل…</span>
+    </div>
+    <nav class="ctrl-row" aria-label="أدوات القارئ">
+      <a href="index.html" class="btn">🏠 الرئيسية</a>
+      <button class="btn" id="btn-names"    type="button">الأسماء</button>
+      <button class="btn" id="btn-settings" type="button">الإعدادات</button>
+      <button class="btn primary" id="btn-continue" type="button">استمرار</button>
+    </nav>
+  </header>
+
+  <!-- Names panel -->
+  <aside id="names-panel" class="panel" aria-label="أسماء الله الحسنى">
+    <button class="panel-close" id="close-names" type="button" aria-label="إغلاق">✕</button>
+    <h3>أسماء الله الحسنى</h3>
+    <div id="names-list"></div>
+  </aside>
+
+  <!-- Settings panel -->
+  <aside id="settings-panel" class="panel" aria-label="الإعدادات">
+    <button class="panel-close" id="close-settings" type="button" aria-label="إغلاق">✕</button>
+    <h3>الإعدادات</h3>
+    <div class="s-row">
+      <span class="s-label">المظهر</span>
+      <div class="theme-grid">
+        <button class="th-btn" data-t="light"  type="button">فاتح</button>
+        <button class="th-btn" data-t="dark"   type="button">غامق</button>
+        <button class="th-btn" data-t="sepia"  type="button">سيبيا</button>
+        <button class="th-btn" data-t="sand"   type="button">رملي</button>
+      </div>
+    </div>
+    <div class="s-row">
+      <label class="s-label" for="font-sel">الخط</label>
+      <select id="font-sel">
+        <option value="amiri">Amiri (أميري)</option>
+        <option value="cairo">Cairo (قاهرة)</option>
+        <option value="tajawal">Tajawal (تجوال)</option>
+        <option value="noto">Noto Naskh Arabic</option>
+      </select>
+    </div>
+    <div class="s-row">
+      <span class="s-label">حجم الخط</span>
+      <div class="num-row">
+        <button class="num-btn" id="font-dec" type="button">−</button>
+        <span   class="num-val" id="font-val">18px</span>
+        <button class="num-btn" id="font-inc" type="button">+</button>
+      </div>
+    </div>
+    <div class="s-row">
+      <label class="s-label" for="lh-range">ارتفاع السطر</label>
+      <div class="num-row">
+        <input type="range" id="lh-range" min="1.5" max="3" step="0.1" value="2">
+        <span  class="num-val" id="lh-val">2.0</span>
+      </div>
+    </div>
+    <button class="btn" id="btn-reset" type="button" style="width:100%;margin-top:.4rem">إعادة الضبط</button>
+  </aside>
+
+  <div id="overlay" aria-hidden="true"></div>
+
+  <main id="wrap">
+    <!-- Loading bar shown during multi-chunk load -->
+    <div id="load-bar-wrap" aria-live="polite">
+      <span id="load-bar-txt">جارٍ التحميل…</span>
+      <div id="load-bar-bg"><div id="load-bar-fill"></div></div>
+    </div>
+    <div id="content">
+      <div class="msg"><h2>جارٍ التحميل…</h2><p>يُرجى الانتظار</p></div>
+    </div>
+    <div id="load-spinner"></div>
+  </main>
+
+  <div id="save-ind" role="status" aria-live="polite">تم حفظ موضع القراءة ✓</div>
+
+<script>
+(function () {
+'use strict';
+
+/* ══════════════════════════════════════════════════════════
+   DATA — all parts and names with their starting chunks
+══════════════════════════════════════════════════════════ */
+const PARTS = [
+  {
+    id:1, title:'أسماء الجمال والرَّحمة',
+    base:'chapters/part1', count:39,
+    names:[
+      { ar:'الرَّحْمٰن',            chunk:4  },
+      { ar:'الرَّحِيم',             chunk:5  },
+      { ar:'الغَفُور',              chunk:6  },
+      { ar:'الغَفَّار',             chunk:7  },
+      { ar:'التَّوَّاب',            chunk:8  },
+      { ar:'الـعَفـُـو',            chunk:9  },
+      { ar:'الــبـَـرُّ',           chunk:11 },
+      { ar:'الــرَّؤوف',            chunk:12 },
+      { ar:'الكَرِيم',              chunk:14 },
+      { ar:'الوَدُود',              chunk:15 },
+      { ar:'الـمُؤمِن الصَّادِق',   chunk:16 },
+      { ar:'اللَّطيف',              chunk:18 },
+      { ar:'الشَّكُور',             chunk:19 },
+      { ar:'ٱلْحَلِيمُ',            chunk:20 },
+      { ar:'ٱلْحَيِيُّ',            chunk:22 },
+      { ar:'ٱلسِّتِّيرُ',           chunk:23 },
+      { ar:'ٱلطَّيِّبُ',            chunk:25 },
+      { ar:'ٱلْجَمِيلُ',            chunk:26 },
+      { ar:'ٱلْمُحْسِنُ',           chunk:28 },
+      { ar:'ٱلْمُعْطِي ٱلْجَوَادُ', chunk:30 },
+      { ar:'ٱلْمَنَّانُ',           chunk:32 },
+      { ar:'ٱلْوَهَّابُ',           chunk:34 },
+      { ar:'ٱلرَّفِيقُ',            chunk:36 },
+    ]
+  },
+  {
+    id:2, title:'أسماء الجلال والكِبرياء',
+    base:'chapters/part2', count:35,
+    names:[
+      { ar:'ٱلْمَلِكُ وٱلْمَلِيكُ',         chunk:1  },
+      { ar:'ٱلْعَزِيزُ ٱلْجَبَّارُ',         chunk:4  },
+      { ar:'ٱلْمُتَكَبِّرُ',                 chunk:8  },
+      { ar:'ٱلْقَاهِرُ ٱلْقَهَّارُ',         chunk:10 },
+      { ar:'ٱلدَّيَّانُ',                    chunk:14 },
+      { ar:'ٱلسَّيِّدُ',                     chunk:17 },
+      { ar:'ٱلْكَبِيرُ',                     chunk:20 },
+      { ar:'ٱللَّهُ ٱلْإِلَٰهُ',             chunk:23 },
+      { ar:'ذُو ٱلْجَلَالِ وَٱلْإِكْرَامِ',   chunk:28 },
+      { ar:'الرَّب',                         chunk:31 },
+    ]
+  },
+  {
+    id:3, title:'أسماء التنزيه والعُلُوّ',
+    base:'chapters/part3', count:41,
+    names:[
+      { ar:'ٱلْعَظِيمُ',                         chunk:1  },
+      { ar:'ٱلْعَلِيُّ ٱلْأَعْلَى ٱلْمُتَعَالِي', chunk:5  },
+      { ar:'ٱلْأَحَدُ ٱلْوَاحِدُ',               chunk:10 },
+      { ar:'ٱلْوِتْرُ',                          chunk:15 },
+      { ar:'ٱلصَّمَدُ',                          chunk:18 },
+      { ar:'ٱلْقُدُّوسُ ٱلسُّبُّوحُ',            chunk:22 },
+      { ar:'ٱلْمَجِيدُ',                         chunk:26 },
+      { ar:'ٱلنُّورُ',                           chunk:30 },
+      { ar:'ٱلْحَقُّ ٱلْمُبِينُ',                chunk:33 },
+    ]
+  },
+  {
+    id:4, title:'أسماء العِلم والرِّقابة',
+    base:'chapters/part4', count:51,
+    names:[
+      { ar:'ٱلْعَلِيمُ',  chunk:2  },
+      { ar:'ٱلْخَبِيرُ',  chunk:6  },
+      { ar:'ٱلسَّمِيعُ',  chunk:10 },
+      { ar:'ٱلْبَصِيرُ',  chunk:14 },
+      { ar:'ٱلرَّقِيبُ',  chunk:17 },
+      { ar:'ٱلشَّهِيدُ',  chunk:20 },
+      { ar:'ٱلْحَسِيبُ',  chunk:24 },
+      { ar:'ٱلْحَفِيظُ',  chunk:28 },
+      { ar:'ٱلْحَافِظُ',  chunk:32 },
+      { ar:'ٱلْحَكِيمُ',  chunk:35 },
+      { ar:'ٱلْحَكَمُ',   chunk:39 },
+      { ar:'ٱلْكَفِيلُ',  chunk:43 },
+      { ar:'ٱلْكَافِي',   chunk:47 },
+    ]
+  },
+  {
+    id:5, title:'أسماء القُدرة والخَلق',
+    base:'chapters/part5', count:42,
+    names:[
+      { ar:'ٱلْقَدِيرُ',           chunk:1  },
+      { ar:'ٱلْقَادِرُ',           chunk:5  },
+      { ar:'ٱلْمُقْتَدِرُ',        chunk:8  },
+      { ar:'ٱلْقَوِيُّ',           chunk:11 },
+      { ar:'ٱلْمَتِينُ',           chunk:14 },
+      { ar:'ٱلْخَالِقُ',           chunk:16 },
+      { ar:'ٱلْخَلَّاقُ',          chunk:19 },
+      { ar:'ٱلْبَارِئُ',           chunk:21 },
+      { ar:'ٱلْمُصَوِّرُ',         chunk:25 },
+      { ar:'ٱلرَّزَّاقُ الرَّازِق', chunk:33 },
+    ]
+  },
+  {
+    id:6, title:'أسماء التدبير والولاية',
+    base:'chapters/part6', count:33,
+    names:[
+      { ar:'ٱلْقَابِضُ',   chunk:1  },
+      { ar:'ٱلْبَاسِطُ',   chunk:4  },
+      { ar:'ٱلْفَتَّاحُ',  chunk:8  },
+      { ar:'ٱلْمُقِيتُ',   chunk:13 },
+      { ar:'ٱلْمُقَدِّمُ', chunk:19 },
+      { ar:'ٱلْمُؤَخِّرُ', chunk:24 },
+      { ar:'ٱلْوَارِثُ',   chunk:29 },
+    ]
+  },
+  {
+    id:7, title:'أسماء ختامية',
+    base:'chapters/part7', count:38,
+    names:[
+      { ar:'الْأَوَّلُ وَالْآخِرُ وَالظَّاهِرُ وَالْبَاطِنُ', chunk:1  },
+      { ar:'الْقَرِيبُ الْمُجِيبُ الشَّافِي',                 chunk:5  },
+      { ar:'ٱلْغَالِبُ ٱلنَّصِيرُ',                          chunk:8  },
+      { ar:'ٱلْوَكِيلُ ٱلْحَيُّ ٱلْقَيُّومُ',               chunk:13 },
+      { ar:'السَّلَام',                                       chunk:17 },
+      { ar:'الغَنِيّ',                                        chunk:20 },
+      { ar:'ٱلْوَلِيُّ ٱلْمَوْلَى',                          chunk:23 },
+      { ar:'الهَادِي',                                        chunk:28 },
+      { ar:'ٱلْمُهَيْمِنُ ٱلْوَاسِعُ ٱلْمُحِيطُ',           chunk:32 },
+    ]
+  }
+];
+
+/* ══════════════════════════════════════════════════════════
+   STORAGE
+══════════════════════════════════════════════════════════ */
+const SK     = 'asma_v3_';
+const GLOB_K = SK + 'global';
+const SETT_K = SK + 'settings';
+
+function stor(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(_){} }
+function read(k, d=null) { try { const r=localStorage.getItem(k); return r?JSON.parse(r):d; } catch(_){ return d; } }
+
+function saveGlobal() {
+  if (!S.part) return;
+  const rec = { partId:S.part.id, maxChunk:S.maxC, scrollY:window.scrollY, ts:Date.now() };
+  stor(GLOB_K, rec);
+  stor(SK+'part'+S.part.id, rec);
+}
+
+/* ══════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════ */
+const S = {
+  part:null, maxC:0,
+  loadingNext:false,
+  lastY:0, scrollDir:0,
+  saveTimer:null,
+  theme:'light', fontKey:'amiri', fontSize:18, lineHeight:2,
+};
+
+/* ══════════════════════════════════════════════════════════
+   DOM REFS
+══════════════════════════════════════════════════════════ */
+const g = id => document.getElementById(id);
+const D = {
+  topbar:   g('topbar'),
+  badge:    g('part-badge'),
+  content:  g('content'),
+  spinner:  g('load-spinner'),
+  prog:     g('prog-fill'),
+  lbWrap:   g('load-bar-wrap'),
+  lbTxt:    g('load-bar-txt'),
+  lbFill:   g('load-bar-fill'),
+  namesP:   g('names-panel'),
+  setP:     g('settings-panel'),
+  nameL:    g('names-list'),
+  overlay:  g('overlay'),
+  saveInd:  g('save-ind'),
+  btnN:     g('btn-names'),
+  btnS:     g('btn-settings'),
+  btnC:     g('btn-continue'),
+  btnR:     g('btn-reset'),
+  fontSel:  g('font-sel'),
+  fontDec:  g('font-dec'),
+  fontInc:  g('font-inc'),
+  fontVal:  g('font-val'),
+  lhR:      g('lh-range'),
+  lhV:      g('lh-val'),
+};
+
+/* ══════════════════════════════════════════════════════════
+   FONT LOADER (non-blocking — zero render delay)
+══════════════════════════════════════════════════════════ */
+const FONT_URLS = {
+  amiri:   'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap',
+  cairo:   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
+  tajawal: 'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap',
+  noto:    'https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&display=swap',
+};
+const FONT_CSS = {
+  amiri:   '"Amiri",Georgia,"Times New Roman",serif',
+  cairo:   '"Cairo",system-ui,sans-serif',
+  tajawal: '"Tajawal",system-ui,sans-serif',
+  noto:    '"Noto Naskh Arabic",Georgia,serif',
+};
+const loadedFonts = new Set();
+function loadFont(k) {
+  if (loadedFonts.has(k) || !FONT_URLS[k]) return;
+  loadedFonts.add(k);
+  const l = document.createElement('link');
+  l.rel = 'stylesheet'; l.href = FONT_URLS[k];
+  document.head.appendChild(l);
+}
+loadFont('amiri');
+setTimeout(() => loadFont('cairo'), 300);
+
+/* ══════════════════════════════════════════════════════════
+   SETTINGS
+══════════════════════════════════════════════════════════ */
+function applyTheme(t) {
+  S.theme = t;
+  document.body.classList.remove('dark','sepia','sand');
+  if (t !== 'light') document.body.classList.add(t);
+  document.querySelectorAll('.th-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
+}
+function applyFont(k) {
+  S.fontKey = k; loadFont(k);
+  document.documentElement.style.setProperty('--font', FONT_CSS[k]);
+  D.fontSel.value = k;
+}
+function applySize(px) {
+  S.fontSize = px;
+  document.documentElement.style.setProperty('--size', px+'px');
+  D.fontVal.textContent = px+'px';
+}
+function applyLH(v) {
+  S.lineHeight = v;
+  document.documentElement.style.setProperty('--lh', v);
+  D.lhV.textContent = parseFloat(v).toFixed(1);
+  D.lhR.value = v;
+}
+function saveSett() { stor(SETT_K, { theme:S.theme, fontKey:S.fontKey, fontSize:S.fontSize, lineHeight:S.lineHeight }); }
+function loadSett() {
+  const s = read(SETT_K, {});
+  applyTheme(s.theme    || 'light');
+  applyFont (s.fontKey  || 'amiri');
+  applySize (s.fontSize || 18);
+  applyLH   (s.lineHeight || 2);
+}
+
+/* ══════════════════════════════════════════════════════════
+   PANELS
+══════════════════════════════════════════════════════════ */
+let openP = null;
+function showPanel(p) {
+  if (openP) openP.classList.remove('open');
+  openP = p; p.classList.add('open');
+  D.overlay.classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function hidePanel() {
+  if (openP) { openP.classList.remove('open'); openP = null; }
+  D.overlay.classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAMES LIST (flat, no categories)
+══════════════════════════════════════════════════════════ */
+function buildNames() {
+  const allNames = PARTS.flatMap(p => p.names.map(n => ({ ...n, partId:p.id, partTitle:p.title })));
+  D.nameL.innerHTML = allNames.map(n =>
+    `<button class="name-btn" data-pid="${n.partId}" data-chunk="${n.chunk}" type="button">
+       ${n.ar}<small>${n.partTitle}</small>
+     </button>`
+  ).join('');
+  D.nameL.addEventListener('click', e => {
+    const b = e.target.closest('.name-btn');
+    if (!b) return;
+    hidePanel();
+    goToName(+b.dataset.pid, +b.dataset.chunk, b.querySelector('small') ? b.childNodes[0].textContent.trim() : '');
+  });
+}
+function markActive(partId, chunkNum) {
+  document.querySelectorAll('.name-btn').forEach(b =>
+    b.classList.toggle('active', +b.dataset.pid === partId && +b.dataset.chunk === chunkNum));
+}
+
+/* ══════════════════════════════════════════════════════════
+   FULL-PART FETCH  (chapters/partN-full.html — one file per part)
+   Each file is a raw HTML fragment with the complete part content.
+   Browser caches it after first load so repeat visits are instant.
+══════════════════════════════════════════════════════════ */
+const fullCache = {};
+async function fetchFull(part) {
+  if (fullCache[part.id]) return fullCache[part.id];
+
+  /* (A) Self-contained mode — if this page has the part's content
+         embedded inline (<template id="inline-part-data" data-part-id="N">)
+         use it directly. Zero network, works on file:// and GitHub Pages. */
+  const inlineTpl = document.getElementById('inline-part-data');
+  if (inlineTpl && +inlineTpl.dataset.partId === part.id) {
+    const html = inlineTpl.innerHTML;
+    fullCache[part.id] = html;
+    return html;
+  }
+
+  /* (B) Hub mode — fall back to fetching the shared chapter file.    */
+  const url = part.base + '-full.html';
+  try {
+    const r = await fetch(url, { cache: 'force-cache' });
+    if (!r.ok) { fullCache[part.id] = null; return null; }
+    const html = await r.text();
+    fullCache[part.id] = html;
+    return html;
+  } catch(_) { fullCache[part.id] = null; return null; }
+}
+
+/* Warm the browser's HTTP cache for adjacent parts so switching to
+   the next/previous part feels instant. Low-priority, runs when idle.
+   Each part is warmed at most once per session.                      */
+const warmedParts = new Set();
+function prefetchPart(id) {
+  if (warmedParts.has(id)) return;
+  const part = PARTS.find(p => p.id === id);
+  if (!part) return;
+  warmedParts.add(id);
+  // In self-contained mode, warm the sibling part HTML (partN.html) instead
+  // of the shared chapter fragment (which may not even be deployed).
+  const inlineTpl = document.getElementById('inline-part-data');
+  const url = inlineTpl ? `part${id}.html` : part.base + '-full.html';
+  const run = () => fetch(url, { cache: 'force-cache', priority: 'low' }).catch(() => {});
+  if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 });
+  else setTimeout(run, 800);
+}
+function prefetchAdjacent(currentId) {
+  [currentId - 1, currentId + 1, currentId + 2].forEach(prefetchPart);
+}
+
+function fixImages(root) {
+  root.querySelectorAll('img').forEach(img => {
+    const src = img.getAttribute('src') || '';
+    if (src.includes('.fld/') || src.includes('%20') || src.startsWith('file:'))
+      img.style.display = 'none';
+  });
+}
+
+function fixLayout() {
+  const c = D.content;
+
+  // 1. Remove Word absolute positions that break flow
+  c.querySelectorAll('[style*="position:absolute"],[style*="position: absolute"]').forEach(el => {
+    el.style.position = 'relative';
+    el.style.left = '';
+    el.style.top  = '';
+  });
+
+  // 2. Fix "white text on white background" from Word's coloured-border tables.
+  //    When tables render correctly the cells have coloured bg so white text is fine;
+  //    if the table lost its bg for any reason the text becomes invisible.
+  //    We never want pure-white text on our light page bg, so we strip it.
+  c.querySelectorAll('[style]').forEach(el => {
+    const s = el.style;
+    const col = s.color;
+    if (col && (col === 'white' || col === '#ffffff' || col === 'rgb(255, 255, 255)')) {
+      // Only clear it if the element itself has no dark background
+      const bg = s.backgroundColor;
+      const hasDarkBg = bg && bg !== '' && bg !== 'transparent' &&
+                        bg !== 'rgba(0, 0, 0, 0)' && bg !== 'white' &&
+                        bg !== '#ffffff' && bg !== 'rgb(255, 255, 255)';
+      if (!hasDarkBg) s.color = '';
+    }
+  });
+
+  // 3. Wrap tables for horizontal scroll without breaking display:table model
+  c.querySelectorAll('table').forEach(tbl => {
+    if (tbl.parentElement && tbl.parentElement.classList.contains('tbl-wrap')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'tbl-wrap';
+    tbl.parentNode.insertBefore(wrap, tbl);
+    wrap.appendChild(tbl);
+  });
+
+  fixImages(c);
+}
+
+/* ══════════════════════════════════════════════════════════
+   FIND NAME HEADING in loaded content (for scroll target)
+══════════════════════════════════════════════════════════ */
+function normalize(s) {
+  return s
+    .replace(/[\u064B-\u065F\u0670]/g, '')   // strip tashkeel (NOT U+0671 wasla-alef)
+    .replace(/[\u0671أإآا]/g, 'ا')           // normalise alef variants incl. wasla (ٱ)
+    .replace(/[()（）\[\]]/g, '')
+    .replace(/\s+/g, '');
+}
+
+function findNameHeading(nameAr) {
+  const target = normalize(nameAr);
+  // Check only first word/word pair for robustness
+  const targetShort = target.slice(0, 6);
+
+  const headings = D.content.querySelectorAll('h1,h2,h3,h4');
+  for (const el of headings) {
+    const txt = normalize(el.textContent || '');
+    if (txt.includes(target) || txt.includes(targetShort)) return el;
+  }
+  // Fall back: search paragraphs that might contain the name as bold heading
+  for (const el of D.content.querySelectorAll('p')) {
+    const txt = normalize(el.textContent || '');
+    if (txt === target || (target.length > 4 && txt === target)) return el;
+  }
+  return null;
+}
+
+/* ══════════════════════════════════════════════════════════
+   PROGRESS & UI HELPERS
+══════════════════════════════════════════════════════════ */
+function updateProg() {
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  D.prog.style.width = (total > 0 ? Math.min(100, window.scrollY/total*100) : 0).toFixed(1)+'%';
+}
+function updateBadge() {
+  if (!S.part) return;
+  D.badge.textContent = `${S.part.title} — الجزء ${S.part.id} من 7`;
+}
+function flashSave() {
+  D.saveInd.classList.add('show');
+  clearTimeout(D.saveInd._t);
+  D.saveInd._t = setTimeout(() => D.saveInd.classList.remove('show'), 2200);
+}
+function scheduleSave() {
+  clearTimeout(S.saveTimer);
+  S.saveTimer = setTimeout(() => { saveGlobal(); flashSave(); }, 2500);
+}
+function showLoadBar(current, total) {
+  D.lbWrap.classList.add('show');
+  D.lbTxt.textContent = `جارٍ التحميل ${current} / ${total}…`;
+  D.lbFill.style.width = (total > 0 ? Math.round(current/total*100) : 0)+'%';
+}
+function hideLoadBar() {
+  D.lbWrap.classList.remove('show');
+  D.lbFill.style.width = '0';
+}
+
+/* ══════════════════════════════════════════════════════════
+   CORE: LOAD FULL PART FILE  (chapters/partN-full.html)
+   One HTTP request per part. Browser caches the file so
+   navigating between names in the same part is instant.
+══════════════════════════════════════════════════════════ */
+async function loadPart(part, _targetChunk, scrollToName, restoreScrollY) {
+  S.part = part;
+  S.maxC = part.count;   // full file = all chunks loaded
+  S.loadingNext = false;
+
+  D.content.innerHTML = '';
+  D.spinner.textContent = '';
+  D.lbTxt.textContent = 'جارٍ تحميل الجزء…';
+  D.lbFill.style.width = '0%';
+  D.lbWrap.classList.add('show');
+  updateBadge();
+
+  const html = await fetchFull(part);
+
+  D.lbWrap.classList.remove('show');
+
+  if (!html || !html.trim()) {
+    // Detect local file:// — browsers block fetch() on local files
+    if (location.protocol === 'file:') {
+      D.content.innerHTML =
+        '<div class="msg">' +
+          '<h2>لا يمكن التشغيل من ملف محلي</h2>' +
+          '<p>المتصفحات تمنع تحميل الملفات عبر <code>file://</code> لأسباب أمنية. ' +
+          'يعمل الموقع بشكل كامل بعد رفعه على GitHub Pages، ' +
+          'أو يمكنك تشغيله محلياً بخادم بسيط:</p>' +
+          '<p style="direction:ltr;text-align:left;background:#f4ebe0;padding:.7rem 1rem;border-radius:8px;font-family:monospace;font-size:.88rem;margin-top:.8rem;display:inline-block">python3 -m http.server 8000</p>' +
+          '<p>ثم افتح <code>http://localhost:8000/</code></p>' +
+        '</div>';
+      return;
+    }
+    D.content.innerHTML =
+      '<div class="msg"><h2>تعذّر تحميل المحتوى</h2>' +
+      '<p>يُرجى التحقق من اتصالك بالإنترنت وإعادة تحميل الصفحة.</p></div>';
+    return;
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'chunks-wrapper';
+  wrapper.setAttribute('data-part', part.id);
+  wrapper.innerHTML = html;          // full file parsed in one shot
+  D.content.appendChild(wrapper);
+
+  fixLayout();
+  prefetchAdjacent(part.id);
+
+  // Restore exact scroll position (continue reading)
+  if (typeof restoreScrollY === 'number') {
+    await new Promise(r => requestAnimationFrame(r));
+    await new Promise(r => setTimeout(r, 80));
+    window.scrollTo({ top: restoreScrollY, behavior: 'instant' });
+    updateProg();
+    return;
+  }
+
+  // Scroll to the name heading
+  if (scrollToName) {
+    await new Promise(r => requestAnimationFrame(r));
+    await new Promise(r => setTimeout(r, 80));
+    const el = findNameHeading(scrollToName);
+    if (el) {
+      const y = el.getBoundingClientRect().top + window.scrollY - 90;
+      window.scrollTo({ top: Math.max(0, y), behavior: 'instant' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    updateProg();
+    return;
+  }
+
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  updateProg();
+}
+
+/* ══════════════════════════════════════════════════════════
+   PUBLIC NAVIGATION HELPERS
+══════════════════════════════════════════════════════════ */
+
+/** Navigate to a specific name (click from index or names panel) */
+async function goToName(partId, chunkNum, nameAr) {
+  const part = PARTS.find(p => p.id === partId);
+  if (!part) return;
+
+  /* Self-contained mode: each partN.html only ships with ITS OWN content.
+     If the user clicks a name from a different part, navigate to that
+     part's dedicated page instead of trying to fetch.                   */
+  const inlineTpl = document.getElementById('inline-part-data');
+  if (inlineTpl && +inlineTpl.dataset.partId !== partId) {
+    location.href = `part${partId}.html?start=${chunkNum}`;
+    return;
+  }
+
+  // Update URL without reload
+  const url = new URL(location.href);
+  url.searchParams.set('part',  partId);
+  url.searchParams.set('start', chunkNum);
+  url.searchParams.delete('restore');
+  history.replaceState(null, '', url.toString());
+
+  markActive(partId, chunkNum);
+  await loadPart(part, chunkNum, nameAr, null);
+}
+
+/** Restore last saved session */
+async function restoreSession(saved) {
+  const part = PARTS.find(p => p.id === saved.partId);
+  if (!part) return false;
+
+  D.content.innerHTML = `<div class="msg"><h2>جارٍ استعادة موضع القراءة…</h2></div>`;
+
+  const url = new URL(location.href);
+  url.searchParams.set('part', saved.partId);
+  url.searchParams.set('start', saved.maxChunk);
+  url.searchParams.set('restore', '1');
+  history.replaceState(null, '', url.toString());
+
+  markActive(saved.partId, saved.maxChunk);
+  await loadPart(part, Math.min(saved.maxChunk, part.count), null, saved.scrollY);
+  return true;
+}
+
+/** "Continue Reading" button */
+async function continueReading() {
+  const saved = read(GLOB_K);
+  if (saved && saved.partId) {
+    await restoreSession(saved);
+  } else {
+    // First visit — open with the first name الرَّحْمٰن
+    await goToName(1, 4, 'الرَّحْمٰن');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   SCROLL HANDLER
+══════════════════════════════════════════════════════════ */
+let ticking = false;
+function onScroll() {
+  if (ticking) return;
+  ticking = true;
+  requestAnimationFrame(() => {
+    ticking = false;
+    updateProg();
+
+    // Auto-hide topbar on scroll-down, reveal on scroll-up
+    const y   = window.scrollY;
+    const dir = y > S.lastY ? 1 : -1;
+    if (dir !== S.scrollDir) {
+      S.scrollDir = dir;
+      D.topbar.classList.toggle('hidden', dir === 1 && y > 100);
+    }
+    S.lastY = y;
+
+    scheduleSave();
+  });
+}
+
+/* ══════════════════════════════════════════════════════════
+   WIRE EVENTS
+══════════════════════════════════════════════════════════ */
+function wireEvents() {
+  D.btnN.addEventListener('click', () => showPanel(D.namesP));
+  D.btnS.addEventListener('click', () => showPanel(D.setP));
+  D.overlay.addEventListener('click', hidePanel);
+  g('close-names').addEventListener('click', hidePanel);
+  g('close-settings').addEventListener('click', hidePanel);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') hidePanel(); });
+
+  D.btnC.addEventListener('click', continueReading);
+
+  document.querySelectorAll('.th-btn').forEach(b => {
+    b.addEventListener('click', () => { applyTheme(b.dataset.t); saveSett(); });
+  });
+  D.fontSel.addEventListener('change', () => { applyFont(D.fontSel.value); saveSett(); });
+  D.fontInc.addEventListener('click', () => { applySize(Math.min(32, S.fontSize+1)); saveSett(); });
+  D.fontDec.addEventListener('click', () => { applySize(Math.max(12, S.fontSize-1)); saveSett(); });
+  D.lhR.addEventListener('input', () => { applyLH(D.lhR.value); saveSett(); });
+  D.btnR.addEventListener('click', () => {
+    applyTheme('light'); applyFont('amiri'); applySize(18); applyLH(2); saveSett();
+  });
+
+  window.addEventListener('scroll', onScroll, { passive:true });
+
+  // Force-save before leaving
+  const forceSave = () => { clearTimeout(S.saveTimer); saveGlobal(); };
+  window.addEventListener('pagehide',           forceSave);
+  window.addEventListener('beforeunload',       forceSave);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) forceSave(); });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 820) hidePanel();
+    updateProg();
+  }, { passive:true });
+}
+
+/* ══════════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════════ */
+async function init() {
+  loadSett();
+  buildNames();
+  wireEvents();
+
+  const p       = new URLSearchParams(location.search);
+  const partId  = +p.get('part')  || 0;
+  const start   = +p.get('start') || 0;
+  const restore = p.has('restore');
+
+  // Explicit restore request
+  if (restore && partId && start) {
+    const saved = read(GLOB_K) || read(SK+'part'+partId);
+    if (saved && saved.partId) { await restoreSession(saved); return; }
+  }
+
+  // Direct name navigation from index (part + start chunk)
+  if (partId && start) {
+    // Find the name text for this part/chunk so we can scroll to heading
+    const part = PARTS.find(p => p.id === partId);
+    const nameEntry = part && part.names.find(n => n.chunk === start);
+    const nameAr = nameEntry ? nameEntry.ar : null;
+    markActive(partId, start);
+    await goToName(partId, start, nameAr);
+    return;
+  }
+
+  // Part only — check saved position for that part
+  if (partId) {
+    const saved = read(SK+'part'+partId);
+    if (saved && saved.maxChunk) { await restoreSession({ ...saved, partId }); return; }
+    const part = PARTS.find(p => p.id === partId);
+    if (part) { await goToName(partId, 1, null); }
+    return;
+  }
+
+  // No URL params — auto-restore global session
+  const glob = read(GLOB_K);
+  if (glob && glob.partId) { await restoreSession(glob); return; }
+
+  // Very first visit — start at الرَّحْمٰن
+  await goToName(1, 4, 'الرَّحْمٰن');
+}
+
+init();
+
+/* ══════════════════════════════════════════════════════════
+   SERVICE WORKER  (offline cache → instant repeat visits)
+══════════════════════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .catch(() => {});
+  });
+}
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بأسمائه نحيا — الأسماء الحسنى</title>
+  <meta name="description" content="أسماء الله الحسنى — اضغط على أي اسم للانتقال مباشرةً إلى قراءته">
+
+  <!-- ── INSTANT-NAVIGATION PREFETCH ─────────────────────────────────────
+       Prefetch all 7 self-contained part pages in the background so
+       clicking any name opens instantly from browser cache. Browsers
+       schedule these at idle/low priority and skip them on Save-Data
+       mode or slow connections.                                       -->
+  <link rel="prefetch" href="part1.html" as="document">
+  <link rel="prefetch" href="part2.html" as="document">
+  <link rel="prefetch" href="part3.html" as="document">
+  <link rel="prefetch" href="part4.html" as="document">
+  <link rel="prefetch" href="part5.html" as="document">
+  <link rel="prefetch" href="part6.html" as="document">
+  <link rel="prefetch" href="part7.html" as="document">
+  <link rel="preload"  href="assets/uthmanic-hafs.otf" as="font" type="font/otf" crossorigin="anonymous">
+  <style>
+    :root {
+      --bg:     #f7f1ea;
+      --card:   #ffffff;
+      --text:   #22150c;
+      --muted:  #6d5b50;
+      --accent: #8e4218;
+      --a2:     #d8b59a;
+      --border: rgba(142,66,24,.12);
+      --shadow: 0 6px 22px rgba(49,27,16,.07);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin:0; padding:0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Georgia,"Times New Roman",serif;
+      min-height: 100vh;
+    }
+
+    /* ── HERO ──────────────────────────────────────────────────────── */
+    .hero {
+      text-align: center;
+      padding: 2.4rem 1.5rem 1.8rem;
+      background: linear-gradient(180deg,rgba(255,255,255,.72),transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 {
+      color: var(--accent);
+      font-size: clamp(1.8rem,5vw,2.6rem);
+      line-height: 1.2;
+      margin-bottom: .4rem;
+    }
+    .hero-sub {
+      color: var(--muted);
+      font-size: .98rem;
+      font-family: system-ui,sans-serif;
+      line-height: 1.7;
+    }
+
+    /* ── CONTINUE READING BANNER ───────────────────────────────────── */
+    #banner {
+      display: none;               /* shown by JS when position saved */
+      max-width: 820px;
+      margin: 1.2rem auto 0;
+      background: var(--card);
+      border: 1px solid var(--a2);
+      border-radius: 14px;
+      padding: .95rem 1.3rem;
+      box-shadow: var(--shadow);
+      align-items: center;
+      justify-content: space-between;
+      gap: .75rem;
+      flex-wrap: wrap;
+    }
+    #banner.visible { display: flex; }
+    .banner-txt {
+      font-family: system-ui,sans-serif;
+      font-size: .9rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .banner-txt strong { color: var(--accent); }
+    .cont-btn {
+      display: inline-flex; align-items: center; gap: .3rem;
+      padding: .52rem 1.1rem; min-height: 42px;
+      background: linear-gradient(135deg, var(--a2), var(--accent));
+      color: #fff; border: none; border-radius: 10px;
+      font-family: system-ui,sans-serif; font-size: .88rem;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+      transition: opacity .18s;
+    }
+    .cont-btn:hover { opacity: .87; }
+
+    /* ── SEARCH ────────────────────────────────────────────────────── */
+    .search-wrap {
+      max-width: 820px;
+      margin: 1.4rem auto .4rem;
+      padding: 0 1rem;
+    }
+    #search {
+      width: 100%; padding: .62rem 1rem;
+      border: 1px solid var(--border); border-radius: 12px;
+      background: var(--card); color: var(--text);
+      font-family: Georgia,serif; font-size: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+      outline: none;
+      transition: border-color .18s, box-shadow .18s;
+    }
+    #search:focus { border-color: var(--a2); box-shadow: 0 2px 12px rgba(142,66,24,.1); }
+    #search::placeholder { color: var(--muted); opacity:.75; font-family: system-ui,sans-serif; }
+
+    /* ── GALLERY GRID — all names flat ─────────────────────────────── */
+    #gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px,1fr));
+      gap: .7rem;
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: .6rem 1rem 3rem;
+    }
+
+    .name-card {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 1rem .65rem .85rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      text-decoration: none; color: var(--text);
+      cursor: pointer;
+      transition: transform .17s, border-color .17s, box-shadow .17s;
+      min-height: 78px;
+    }
+    .name-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--a2);
+      box-shadow: 0 10px 28px rgba(49,27,16,.12);
+    }
+    .name-ar {
+      font-size: 1.12rem;
+      line-height: 1.5;
+      color: var(--accent);
+    }
+
+    /* Search filter */
+    .name-card.hidden { display: none; }
+
+    /* ── NO RESULTS ────────────────────────────────────────────────── */
+    #no-results {
+      display: none;
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--muted);
+      font-family: system-ui,sans-serif;
+    }
+
+    /* ── FOOTER ────────────────────────────────────────────────────── */
+    .footer {
+      text-align: center; padding: 1.2rem 1rem 2rem;
+      color: var(--muted); font-family: system-ui,sans-serif; font-size: .8rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+
+    /* ── RESPONSIVE ────────────────────────────────────────────────── */
+    @media (max-width:560px) {
+      .hero { padding: 1.8rem 1rem 1.4rem; }
+      #gallery { grid-template-columns: repeat(auto-fill, minmax(120px,1fr)); gap: .55rem; padding: .5rem .65rem 2.5rem; }
+      .name-card { padding: .85rem .5rem .7rem; min-height: 68px; }
+      .name-ar { font-size: .98rem; }
+      #banner { margin: 1rem .65rem 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="hero">
+    <h1>بأسمائه نحيا</h1>
+    <p class="hero-sub">اضغط على أي اسم للانتقال مباشرةً إلى قراءته</p>
+
+    <!-- shown only when a saved reading position exists -->
+    <div id="banner">
+      <div class="banner-txt">
+        <strong>استمر من حيث توقّفت</strong>
+        <span id="banner-detail"> — جلسة قراءة محفوظة</span>
+      </div>
+      <a id="cont-link" href="reader.html" class="cont-btn">← استمرار القراءة</a>
+    </div>
+  </header>
+
+  <div class="search-wrap">
+    <input type="search" id="search" placeholder="ابحث عن اسم…" autocomplete="off" aria-label="بحث">
+  </div>
+
+  <main id="gallery" aria-label="أسماء الله الحسنى"></main>
+  <div id="no-results">لا توجد نتائج مطابقة</div>
+
+  <footer class="footer">
+    كتاب <strong>بأسمائه نحيا</strong> — فقه الحب والتقوى في الأسماء الحسنى &nbsp;|&nbsp;
+    <a href="part1.html">فتح القارئ</a>
+  </footer>
+
+<script>
+(function(){
+'use strict';
+
+/* ── ALL NAMES (flat list, in order across all 7 parts) ───────────── */
+const NAMES = [
+  /* Part 1 — الجمال والرحمة */
+  { ar:'الرَّحْمٰن',              p:1, c:4  },
+  { ar:'الرَّحِيم',               p:1, c:5  },
+  { ar:'الغَفُور',                p:1, c:6  },
+  { ar:'الغَفَّار',               p:1, c:7  },
+  { ar:'التَّوَّاب',              p:1, c:8  },
+  { ar:'الـعَفـُـو',              p:1, c:9  },
+  { ar:'الــبـَـرُّ',             p:1, c:11 },
+  { ar:'الــرَّؤوف',              p:1, c:12 },
+  { ar:'الكَرِيم',                p:1, c:14 },
+  { ar:'الوَدُود',                p:1, c:15 },
+  { ar:'الـمُؤمِن الصَّادِق',     p:1, c:16 },
+  { ar:'اللَّطيف',                p:1, c:18 },
+  { ar:'الشَّكُور',               p:1, c:19 },
+  { ar:'ٱلْحَلِيمُ',              p:1, c:20 },
+  { ar:'ٱلْحَيِيُّ',              p:1, c:22 },
+  { ar:'ٱلسِّتِّيرُ',             p:1, c:23 },
+  { ar:'ٱلطَّيِّبُ',              p:1, c:25 },
+  { ar:'ٱلْجَمِيلُ',              p:1, c:26 },
+  { ar:'ٱلْمُحْسِنُ',             p:1, c:28 },
+  { ar:'ٱلْمُعْطِي ٱلْجَوَادُ',   p:1, c:30 },
+  { ar:'ٱلْمَنَّانُ',             p:1, c:32 },
+  { ar:'ٱلْوَهَّابُ',             p:1, c:34 },
+  { ar:'ٱلرَّفِيقُ',              p:1, c:36 },
+  /* Part 2 — الجلال والكبرياء */
+  { ar:'ٱلْمَلِكُ وٱلْمَلِيكُ',          p:2, c:1  },
+  { ar:'ٱلْعَزِيزُ ٱلْجَبَّارُ',          p:2, c:4  },
+  { ar:'ٱلْمُتَكَبِّرُ',                  p:2, c:8  },
+  { ar:'ٱلْقَاهِرُ ٱلْقَهَّارُ',          p:2, c:10 },
+  { ar:'ٱلدَّيَّانُ',                     p:2, c:14 },
+  { ar:'ٱلسَّيِّدُ',                      p:2, c:17 },
+  { ar:'ٱلْكَبِيرُ',                      p:2, c:20 },
+  { ar:'ٱللَّهُ ٱلْإِلَٰهُ',              p:2, c:23 },
+  { ar:'ذُو ٱلْجَلَالِ وَٱلْإِكْرَامِ',    p:2, c:28 },
+  { ar:'الرَّب',                          p:2, c:31 },
+  /* Part 3 — التنزيه والعلو */
+  { ar:'ٱلْعَظِيمُ',                          p:3, c:1  },
+  { ar:'ٱلْعَلِيُّ ٱلْأَعْلَى ٱلْمُتَعَالِي',  p:3, c:5  },
+  { ar:'ٱلْأَحَدُ ٱلْوَاحِدُ',                p:3, c:10 },
+  { ar:'ٱلْوِتْرُ',                           p:3, c:15 },
+  { ar:'ٱلصَّمَدُ',                           p:3, c:18 },
+  { ar:'ٱلْقُدُّوسُ ٱلسُّبُّوحُ',             p:3, c:22 },
+  { ar:'ٱلْمَجِيدُ',                          p:3, c:26 },
+  { ar:'ٱلنُّورُ',                            p:3, c:30 },
+  { ar:'ٱلْحَقُّ ٱلْمُبِينُ',                 p:3, c:33 },
+  /* Part 4 — العلم والرقابة */
+  { ar:'ٱلْعَلِيمُ',  p:4, c:2  },
+  { ar:'ٱلْخَبِيرُ',  p:4, c:6  },
+  { ar:'ٱلسَّمِيعُ',  p:4, c:10 },
+  { ar:'ٱلْبَصِيرُ',  p:4, c:14 },
+  { ar:'ٱلرَّقِيبُ',  p:4, c:17 },
+  { ar:'ٱلشَّهِيدُ',  p:4, c:20 },
+  { ar:'ٱلْحَسِيبُ',  p:4, c:24 },
+  { ar:'ٱلْحَفِيظُ',  p:4, c:28 },
+  { ar:'ٱلْحَافِظُ',  p:4, c:32 },
+  { ar:'ٱلْحَكِيمُ',  p:4, c:35 },
+  { ar:'ٱلْحَكَمُ',   p:4, c:39 },
+  { ar:'ٱلْكَفِيلُ',  p:4, c:43 },
+  { ar:'ٱلْكَافِي',   p:4, c:47 },
+  /* Part 5 — القدرة والخلق */
+  { ar:'ٱلْقَدِيرُ',            p:5, c:1  },
+  { ar:'ٱلْقَادِرُ',            p:5, c:5  },
+  { ar:'ٱلْمُقْتَدِرُ',         p:5, c:8  },
+  { ar:'ٱلْقَوِيُّ',            p:5, c:11 },
+  { ar:'ٱلْمَتِينُ',            p:5, c:14 },
+  { ar:'ٱلْخَالِقُ',            p:5, c:16 },
+  { ar:'ٱلْخَلَّاقُ',           p:5, c:19 },
+  { ar:'ٱلْبَارِئُ',            p:5, c:21 },
+  { ar:'ٱلْمُصَوِّرُ',          p:5, c:25 },
+  { ar:'ٱلرَّزَّاقُ الرَّازِق',  p:5, c:33 },
+  /* Part 6 — التدبير والولاية */
+  { ar:'ٱلْقَابِضُ',    p:6, c:1  },
+  { ar:'ٱلْبَاسِطُ',    p:6, c:4  },
+  { ar:'ٱلْفَتَّاحُ',   p:6, c:8  },
+  { ar:'ٱلْمُقِيتُ',    p:6, c:13 },
+  { ar:'ٱلْمُقَدِّمُ',  p:6, c:19 },
+  { ar:'ٱلْمُؤَخِّرُ',  p:6, c:24 },
+  { ar:'ٱلْوَارِثُ',    p:6, c:29 },
+  /* Part 7 — أسماء ختامية */
+  { ar:'الْأَوَّلُ وَالْآخِرُ وَالظَّاهِرُ وَالْبَاطِنُ', p:7, c:1  },
+  { ar:'الْقَرِيبُ الْمُجِيبُ الشَّافِي',                 p:7, c:5  },
+  { ar:'ٱلْغَالِبُ ٱلنَّصِيرُ',                          p:7, c:8  },
+  { ar:'ٱلْوَكِيلُ ٱلْحَيُّ ٱلْقَيُّومُ',               p:7, c:13 },
+  { ar:'السَّلَام',                                       p:7, c:17 },
+  { ar:'الغَنِيّ',                                        p:7, c:20 },
+  { ar:'ٱلْوَلِيُّ ٱلْمَوْلَى',                          p:7, c:23 },
+  { ar:'الهَادِي',                                        p:7, c:28 },
+  { ar:'ٱلْمُهَيْمِنُ ٱلْوَاسِعُ ٱلْمُحِيطُ',           p:7, c:32 },
+];
+
+/* ── BUILD GALLERY ─────────────────────────────────────────────────── */
+function buildGallery() {
+  const gallery = document.getElementById('gallery');
+  gallery.innerHTML = NAMES.map(n =>
+    `<a class="name-card"
+        href="part${n.p}.html?start=${n.c}"
+        data-name="${n.ar}"
+        data-part="${n.p}"
+        aria-label="${n.ar}">
+       <span class="name-ar">${n.ar}</span>
+     </a>`
+  ).join('');
+
+  /* On hover / touch-start, upgrade the part-file prefetch to a
+     high-priority fetch so by the time the click fires the bytes
+     are already in the HTTP cache. Each part is only warmed once. */
+  const warmed = new Set();
+  function warmPart(p) {
+    if (warmed.has(p)) return;
+    warmed.add(p);
+    fetch(`part${p}.html`, { cache: 'force-cache', priority: 'high' })
+      .catch(() => {});
+  }
+  gallery.addEventListener('pointerenter', e => {
+    const card = e.target.closest && e.target.closest('.name-card');
+    if (card) warmPart(+card.dataset.part);
+  }, { capture: true, passive: true });
+  gallery.addEventListener('touchstart', e => {
+    const card = e.target.closest && e.target.closest('.name-card');
+    if (card) warmPart(+card.dataset.part);
+  }, { capture: true, passive: true });
+}
+
+/* ── CONTINUE READING BANNER + AUTO-REDIRECT ──────────────────────── */
+function initBanner() {
+  const GLOB_K = 'asma_v3_global';
+  let saved;
+  try { const r = localStorage.getItem(GLOB_K); saved = r ? JSON.parse(r) : null; } catch(_){}
+  if (!saved || !saved.partId) return;
+
+  const banner = document.getElementById('banner');
+  const link   = document.getElementById('cont-link');
+  const detail = document.getElementById('banner-detail');
+
+  // Support both old format (maxChunk) and new format (chunkNum)
+  const chunk = saved.chunkNum || saved.maxChunk || 1;
+  const dest  = `part${saved.partId}.html?start=${chunk}`;
+  link.href = dest;
+
+  // Show name if available
+  if (saved.nameAr) {
+    detail.textContent = ` — ${saved.nameAr}`;
+  } else {
+    detail.textContent = ' — جلسة قراءة محفوظة';
+  }
+
+  banner.classList.add('visible');
+
+  /* Auto-redirect countdown: 4 seconds, dismissible */
+  let seconds = 4;
+  const countEl = document.createElement('span');
+  countEl.style.cssText = 'font-size:.75rem;color:var(--muted);display:block;margin-top:.2rem;';
+  countEl.textContent = `سيتم الانتقال تلقائياً خلال ${seconds}…`;
+  banner.querySelector('.banner-txt').appendChild(countEl);
+
+  const ticker = setInterval(() => {
+    seconds--;
+    if (seconds <= 0) {
+      clearInterval(ticker);
+      location.href = dest;
+    } else {
+      countEl.textContent = `سيتم الانتقال تلقائياً خلال ${seconds}…`;
+    }
+  }, 1000);
+
+  // Allow dismissal
+  const dismiss = document.createElement('button');
+  dismiss.type = 'button';
+  dismiss.textContent = '✕';
+  dismiss.style.cssText = 'background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:.2rem .4rem;';
+  dismiss.addEventListener('click', e => {
+    e.preventDefault();
+    clearInterval(ticker);
+    banner.classList.remove('visible');
+  });
+  banner.appendChild(dismiss);
+}
+
+/* ── LIVE SEARCH ───────────────────────────────────────────────────── */
+function initSearch() {
+  const input  = document.getElementById('search');
+  const noRes  = document.getElementById('no-results');
+  const cards  = () => document.querySelectorAll('.name-card');
+
+  function normalize(s) {
+    return s.replace(/[\u064B-\u065F\u0670]/g, '').replace(/\s+/g,'');
+  }
+
+  input.addEventListener('input', () => {
+    const q = normalize(input.value.trim());
+    let anyVisible = false;
+    cards().forEach(card => {
+      const name = normalize(card.dataset.name || '');
+      const match = !q || name.includes(q);
+      card.classList.toggle('hidden', !match);
+      if (match) anyVisible = true;
+    });
+    noRes.style.display = (!q || anyVisible) ? 'none' : 'block';
+  });
+}
+
+/* ── SERVICE WORKER (offline cache → instant repeat visits) ───────── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    // updateViaCache:'none' forces the browser to always check for a new
+    // sw.js on page load — so bumps to CACHE_VERSION propagate immediately.
+    navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      .catch(() => {});
+  });
+}
+
+/* ── INIT ──────────────────────────────────────────────────────────── */
+buildGallery();
+initBanner();
+initSearch();
+
+})();
+</script>
+</body>
+</html>
