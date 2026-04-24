@@ -250,57 +250,35 @@
     </div>
     <nav class="ctrl-row" aria-label="أدوات القارئ">
       <a href="index.html" class="btn">🏠 الرئيسية</a>
-      <button class="btn" id="btn-names"    type="button">الأسماء</button>
-      <button class="btn" id="btn-settings" type="button">الإعدادات</button>
+      <button class="btn" id="btn-feedback" type="button">💬 ملاحظات</button>
       <button class="btn primary" id="btn-continue" type="button">استمرار</button>
     </nav>
   </header>
 
-  <!-- Names panel -->
-  <aside id="names-panel" class="panel" aria-label="أسماء الله الحسنى">
-    <button class="panel-close" id="close-names" type="button" aria-label="إغلاق">✕</button>
-    <h3>أسماء الله الحسنى</h3>
-    <div id="names-list"></div>
-  </aside>
-
-  <!-- Settings panel -->
-  <aside id="settings-panel" class="panel" aria-label="الإعدادات">
-    <button class="panel-close" id="close-settings" type="button" aria-label="إغلاق">✕</button>
-    <h3>الإعدادات</h3>
-    <div class="s-row">
-      <span class="s-label">المظهر</span>
-      <div class="theme-grid">
-        <button class="th-btn" data-t="light"  type="button">فاتح</button>
-        <button class="th-btn" data-t="dark"   type="button">غامق</button>
-        <button class="th-btn" data-t="sepia"  type="button">سيبيا</button>
-        <button class="th-btn" data-t="sand"   type="button">رملي</button>
+  <!-- Feedback panel -->
+  <aside id="feedback-panel" class="panel" aria-label="إرسال ملاحظة">
+    <button class="panel-close" id="close-feedback" type="button" aria-label="إغلاق">✕</button>
+    <h3>💬 أرسل ملاحظة</h3>
+    <form id="feedback-form" novalidate>
+      <div class="s-row">
+        <label class="s-label" for="fb-name">الاسم (اختياري)</label>
+        <input type="text" id="fb-name" name="name" placeholder="اسمك…"
+               style="width:100%;padding:.5rem .7rem;border:1px solid var(--border);border-radius:8px;
+                      background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:.9rem;">
       </div>
-    </div>
-    <div class="s-row">
-      <label class="s-label" for="font-sel">الخط</label>
-      <select id="font-sel">
-        <option value="amiri">Amiri (أميري)</option>
-        <option value="cairo">Cairo (قاهرة)</option>
-        <option value="tajawal">Tajawal (تجوال)</option>
-        <option value="noto">Noto Naskh Arabic</option>
-      </select>
-    </div>
-    <div class="s-row">
-      <span class="s-label">حجم الخط</span>
-      <div class="num-row">
-        <button class="num-btn" id="font-dec" type="button">−</button>
-        <span   class="num-val" id="font-val">18px</span>
-        <button class="num-btn" id="font-inc" type="button">+</button>
+      <div class="s-row">
+        <label class="s-label" for="fb-msg">الملاحظة <span style="color:var(--accent)">*</span></label>
+        <textarea id="fb-msg" name="message" rows="5" required
+                  placeholder="اكتب ملاحظتك هنا…"
+                  style="width:100%;padding:.5rem .7rem;border:1px solid var(--border);border-radius:8px;
+                         background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:.9rem;
+                         resize:vertical;"></textarea>
       </div>
-    </div>
-    <div class="s-row">
-      <label class="s-label" for="lh-range">ارتفاع السطر</label>
-      <div class="num-row">
-        <input type="range" id="lh-range" min="1.5" max="3" step="0.1" value="2">
-        <span  class="num-val" id="lh-val">2.0</span>
-      </div>
-    </div>
-    <button class="btn" id="btn-reset" type="button" style="width:100%;margin-top:.4rem">إعادة الضبط</button>
+      <div id="fb-status" style="font-family:var(--font-ui);font-size:.84rem;margin-bottom:.6rem;min-height:1.2em;"></div>
+      <button type="submit" class="btn primary" style="width:100%;justify-content:center;">
+        إرسال الملاحظة ✉
+      </button>
+    </form>
   </aside>
 
   <div id="overlay" aria-hidden="true"></div>
@@ -460,7 +438,6 @@ const PARTS = [
 ══════════════════════════════════════════════════════════ */
 const SK     = 'asma_v3_';
 const GLOB_K = SK + 'global';
-const SETT_K = SK + 'settings';
 
 function stor(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(_){} }
 function read(k, d=null) { try { const r=localStorage.getItem(k); return r?JSON.parse(r):d; } catch(_){ return d; } }
@@ -488,7 +465,6 @@ const S = {
   loadingNext: false,
   lastY: 0, scrollDir: 0,
   saveTimer: null,
-  theme: 'light', fontKey: 'amiri', fontSize: 18, lineHeight: 2,
 };
 
 /* ══════════════════════════════════════════════════════════
@@ -496,95 +472,23 @@ const S = {
 ══════════════════════════════════════════════════════════ */
 const g = id => document.getElementById(id);
 const D = {
-  topbar:   g('topbar'),
-  badge:    g('part-badge'),
-  content:  g('content'),
-  spinner:  g('load-spinner'),
-  prog:     g('prog-fill'),
-  lbWrap:   g('load-bar-wrap'),
-  lbTxt:    g('load-bar-txt'),
-  lbFill:   g('load-bar-fill'),
-  namesP:   g('names-panel'),
-  setP:     g('settings-panel'),
-  nameL:    g('names-list'),
-  overlay:  g('overlay'),
-  saveInd:  g('save-ind'),
-  btnN:     g('btn-names'),
-  btnS:     g('btn-settings'),
-  btnC:     g('btn-continue'),
-  btnR:     g('btn-reset'),
-  fontSel:  g('font-sel'),
-  fontDec:  g('font-dec'),
-  fontInc:  g('font-inc'),
-  fontVal:  g('font-val'),
-  lhR:      g('lh-range'),
-  lhV:      g('lh-val'),
+  topbar:    g('topbar'),
+  badge:     g('part-badge'),
+  content:   g('content'),
+  spinner:   g('load-spinner'),
+  prog:      g('prog-fill'),
+  lbWrap:    g('load-bar-wrap'),
+  lbTxt:     g('load-bar-txt'),
+  lbFill:    g('load-bar-fill'),
+  feedbackP: g('feedback-panel'),
+  overlay:   g('overlay'),
+  saveInd:   g('save-ind'),
+  btnFB:     g('btn-feedback'),
+  btnC:      g('btn-continue'),
 };
 
 /* ══════════════════════════════════════════════════════════
-   FONT LOADER (non-blocking)
-══════════════════════════════════════════════════════════ */
-const FONT_URLS = {
-  amiri:   'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&display=swap',
-  cairo:   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
-  tajawal: 'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap',
-  noto:    'https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;600&display=swap',
-};
-const FONT_CSS = {
-  amiri:   '"Amiri",Georgia,"Times New Roman",serif',
-  cairo:   '"Cairo",system-ui,sans-serif',
-  tajawal: '"Tajawal",system-ui,sans-serif',
-  noto:    '"Noto Naskh Arabic",Georgia,serif',
-};
-const loadedFonts = new Set();
-function loadFont(k) {
-  if (loadedFonts.has(k) || !FONT_URLS[k]) return;
-  loadedFonts.add(k);
-  const l = document.createElement('link');
-  l.rel = 'stylesheet'; l.href = FONT_URLS[k];
-  document.head.appendChild(l);
-}
-loadFont('amiri');
-setTimeout(() => loadFont('cairo'), 400);
-
-/* ══════════════════════════════════════════════════════════
-   SETTINGS
-══════════════════════════════════════════════════════════ */
-function applyTheme(t) {
-  S.theme = t;
-  document.body.classList.remove('dark','sepia','sand');
-  if (t !== 'light') document.body.classList.add(t);
-  document.querySelectorAll('.th-btn').forEach(b => b.classList.toggle('active', b.dataset.t === t));
-}
-function applyFont(k) {
-  S.fontKey = k; loadFont(k);
-  document.documentElement.style.setProperty('--font', FONT_CSS[k]);
-  D.fontSel.value = k;
-}
-function applySize(px) {
-  S.fontSize = px;
-  document.documentElement.style.setProperty('--size', px+'px');
-  D.fontVal.textContent = px+'px';
-}
-function applyLH(v) {
-  S.lineHeight = v;
-  document.documentElement.style.setProperty('--lh', v);
-  D.lhV.textContent = parseFloat(v).toFixed(1);
-  D.lhR.value = v;
-}
-function saveSett() {
-  stor(SETT_K, { theme:S.theme, fontKey:S.fontKey, fontSize:S.fontSize, lineHeight:S.lineHeight });
-}
-function loadSett() {
-  const s = read(SETT_K, {});
-  applyTheme(s.theme    || 'light');
-  applyFont (s.fontKey  || 'amiri');
-  applySize (s.fontSize || 18);
-  applyLH   (s.lineHeight || 2);
-}
-
-/* ══════════════════════════════════════════════════════════
-   PANELS
+   FEEDBACK PANEL
 ══════════════════════════════════════════════════════════ */
 let openP = null;
 function showPanel(p) {
@@ -599,26 +503,40 @@ function hidePanel() {
   document.body.style.overflow = '';
 }
 
-/* ══════════════════════════════════════════════════════════
-   NAMES LIST
-══════════════════════════════════════════════════════════ */
-function buildNames() {
-  const allNames = PARTS.flatMap(p => p.names.map(n => ({ ...n, partId:p.id, partTitle:p.title })));
-  D.nameL.innerHTML = allNames.map(n =>
-    `<button class="name-btn" data-pid="${n.partId}" data-chunk="${n.chunk}" data-ar="${n.ar}" type="button">
-       ${n.ar}<small>${n.partTitle}</small>
-     </button>`
-  ).join('');
-  D.nameL.addEventListener('click', e => {
-    const b = e.target.closest('.name-btn');
-    if (!b) return;
-    hidePanel();
-    goToName(+b.dataset.pid, +b.dataset.chunk, b.dataset.ar);
+function initFeedback() {
+  const form   = document.getElementById('feedback-form');
+  const status = document.getElementById('fb-status');
+  if (!form) return;
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = document.getElementById('fb-msg').value.trim();
+    if (!msg) { status.style.color='var(--accent)'; status.textContent='يُرجى كتابة ملاحظتك أولاً.'; return; }
+
+    const btn = form.querySelector('[type=submit]');
+    btn.disabled = true;
+    status.style.color = 'var(--muted)';
+    status.textContent = 'جارٍ الإرسال…';
+
+    try {
+      const data = new FormData(form);
+      const res  = await fetch('https://formspree.io/f/xvgoeqzj', {
+        method: 'POST', body: data, headers: { Accept: 'application/json' }
+      });
+      if (res.ok) {
+        status.style.color = '#2e7d32';
+        status.textContent = 'شكراً! وصلت ملاحظتك بنجاح ✓';
+        form.reset();
+      } else {
+        throw new Error('server');
+      }
+    } catch(_) {
+      status.style.color = 'var(--accent)';
+      status.textContent = 'حدث خطأ. يُرجى المحاولة مرة أخرى.';
+    } finally {
+      btn.disabled = false;
+    }
   });
-}
-function markActive(partId, chunkNum) {
-  document.querySelectorAll('.name-btn').forEach(b =>
-    b.classList.toggle('active', +b.dataset.pid === partId && +b.dataset.chunk === chunkNum));
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -911,7 +829,6 @@ async function goToName(partId, chunkNum, nameAr) {
   url.searchParams.delete('restore');
   history.replaceState(null, '', url.toString());
 
-  markActive(partId, chunkNum);
   S.currentChunk  = chunkNum;
   S.currentNameAr = nameAr || '';
   saveGlobal();
@@ -930,7 +847,6 @@ async function restoreSession(saved) {
     return true;
   }
 
-  markActive(saved.partId, saved.chunkNum || 1);
   S.currentChunk  = saved.chunkNum || 1;
   S.currentNameAr = saved.nameAr  || '';
   await loadPart(part, saved.chunkNum || 1, saved.nameAr || null);
@@ -971,25 +887,13 @@ function onScroll() {
    WIRE EVENTS
 ══════════════════════════════════════════════════════════ */
 function wireEvents() {
-  D.btnN.addEventListener('click', () => showPanel(D.namesP));
-  D.btnS.addEventListener('click', () => showPanel(D.setP));
+  if (D.btnFB) D.btnFB.addEventListener('click', () => showPanel(D.feedbackP));
   D.overlay.addEventListener('click', hidePanel);
-  g('close-names').addEventListener('click', hidePanel);
-  g('close-settings').addEventListener('click', hidePanel);
+  const closeFB = g('close-feedback');
+  if (closeFB) closeFB.addEventListener('click', hidePanel);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') hidePanel(); });
 
   D.btnC.addEventListener('click', continueReading);
-
-  document.querySelectorAll('.th-btn').forEach(b => {
-    b.addEventListener('click', () => { applyTheme(b.dataset.t); saveSett(); });
-  });
-  D.fontSel.addEventListener('change', () => { applyFont(D.fontSel.value); saveSett(); });
-  D.fontInc.addEventListener('click', () => { applySize(Math.min(32, S.fontSize + 1)); saveSett(); });
-  D.fontDec.addEventListener('click', () => { applySize(Math.max(12, S.fontSize - 1)); saveSett(); });
-  D.lhR.addEventListener('input',  () => { applyLH(D.lhR.value); saveSett(); });
-  D.btnR.addEventListener('click', () => {
-    applyTheme('light'); applyFont('amiri'); applySize(18); applyLH(2); saveSett();
-  });
 
   window.addEventListener('scroll', onScroll, { passive: true });
 
@@ -1012,9 +916,8 @@ function wireEvents() {
    INIT
 ══════════════════════════════════════════════════════════ */
 async function init() {
-  loadSett();
-  buildNames();
   wireEvents();
+  initFeedback();
 
   const p      = new URLSearchParams(location.search);
   const pParam = +p.get('part')  || 0;
@@ -1030,7 +933,6 @@ async function init() {
     const part      = PARTS.find(q => q.id === targetPart);
     const nameEntry = part && part.names.find(n => n.chunk === start);
     const nameAr    = nameEntry ? nameEntry.ar : null;
-    markActive(targetPart, start);
     await goToName(targetPart, start, nameAr);
     return;
   }
