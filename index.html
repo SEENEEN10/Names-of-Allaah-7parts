@@ -341,6 +341,9 @@ function initBanner() {
   try { const r = localStorage.getItem(GLOB_K); saved = r ? JSON.parse(r) : null; } catch(_){}
   if (!saved || !saved.partId) return;
 
+  // Detect if user intentionally navigated home (?home=1 added by all home buttons)
+  const cameHome = new URLSearchParams(location.search).has('home');
+
   const banner = document.getElementById('banner');
   const link   = document.getElementById('cont-link');
   const detail = document.getElementById('banner-detail');
@@ -357,36 +360,25 @@ function initBanner() {
     detail.textContent = ' — جلسة قراءة محفوظة';
   }
 
-  banner.classList.add('visible');
+  // If user came via home button → show banner only, no auto-redirect
+  if (cameHome) {
+    banner.classList.add('visible');
 
-  /* Auto-redirect countdown: 4 seconds, dismissible */
-  let seconds = 4;
-  const countEl = document.createElement('span');
-  countEl.style.cssText = 'font-size:.75rem;color:var(--muted);display:block;margin-top:.2rem;';
-  countEl.textContent = `سيتم الانتقال تلقائياً خلال ${seconds}…`;
-  banner.querySelector('.banner-txt').appendChild(countEl);
+    // Allow dismissal
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.textContent = '✕';
+    dismiss.style.cssText = 'background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:.2rem .4rem;';
+    dismiss.addEventListener('click', e => {
+      e.preventDefault();
+      banner.classList.remove('visible');
+    });
+    banner.appendChild(dismiss);
+    return;
+  }
 
-  const ticker = setInterval(() => {
-    seconds--;
-    if (seconds <= 0) {
-      clearInterval(ticker);
-      location.href = dest;
-    } else {
-      countEl.textContent = `سيتم الانتقال تلقائياً خلال ${seconds}…`;
-    }
-  }, 1000);
-
-  // Allow dismissal
-  const dismiss = document.createElement('button');
-  dismiss.type = 'button';
-  dismiss.textContent = '✕';
-  dismiss.style.cssText = 'background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:.2rem .4rem;';
-  dismiss.addEventListener('click', e => {
-    e.preventDefault();
-    clearInterval(ticker);
-    banner.classList.remove('visible');
-  });
-  banner.appendChild(dismiss);
+  // Fresh open → redirect immediately (no countdown)
+  location.href = dest;
 }
 
 /* ── LIVE SEARCH ───────────────────────────────────────────────────── */
