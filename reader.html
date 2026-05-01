@@ -14,6 +14,11 @@
       src: url("assets/uthmanic-hafs.otf") format("opentype");
       font-display: swap;
     }
+    @font-face {
+      font-family: "Uthmanic Hafs Local";
+      src: url("assets/uthmanic-hafs.otf") format("opentype");
+      font-display: swap;
+    }
 
     :root {
       --bg:      #f8f4ef;
@@ -140,8 +145,8 @@
        Horizontal scrolling is handled by .tbl-wrap added by fixLayout(). */
     .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
     #content table  { max-width: 100% !important; border-collapse: collapse; }
-    #content .quran-quote,
-    #content .quran-quote * { font-family: "Uthmanic","Noto Naskh Arabic",Georgia,serif !important; letter-spacing: 0 !important; word-spacing: .04em; }
+    .quran-quote,
+    .quran-quote * { font-family: "Uthmanic","Uthmanic Hafs Local","Noto Naskh Arabic",Georgia,serif !important; letter-spacing: 0 !important; word-spacing: .04em; font-size: 17pt !important; line-height: 1.8 !important; direction: rtl; }
 
     /* ── STATUS / LOADER ──────────────────────────────────────────────── */
     .msg { text-align: center; padding: 3rem 1rem; color: var(--muted); }
