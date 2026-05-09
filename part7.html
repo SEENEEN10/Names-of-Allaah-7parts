@@ -578,7 +578,7 @@ function initFeedback() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   CHUNK FETCHER  (cache-first, ~185 KB per chunk)
+   CHUNK FETCHER  (network-first, ~185 KB per chunk)
 ══════════════════════════════════════════════════════════ */
 const chunkCache = {};
 
@@ -587,7 +587,7 @@ async function fetchChunk(part, num) {
   if (chunkCache[key] !== undefined) return chunkCache[key];
   const url = `${part.base}/chunk-${String(num).padStart(3,'0')}.html`;
   try {
-    const r = await fetch(url, { cache: 'force-cache' });
+    const r = await fetch(url, { cache: 'no-cache' });
     if (!r.ok) { chunkCache[key] = null; return null; }
     const html = await r.text();
     chunkCache[key] = html;
@@ -600,7 +600,7 @@ function prefetchChunk(part, num) {
   if (num < 1 || num > part.count) return;
   const key = `${part.id}-${num}`;
   if (chunkCache[key] !== undefined) return;
-  fetch(`${part.base}/chunk-${String(num).padStart(3,'0')}.html`, { cache: 'force-cache', priority:'low' })
+  fetch(`${part.base}/chunk-${String(num).padStart(3,'0')}.html`, { cache: 'no-cache', priority:'low' })
     .catch(() => {});
 }
 

@@ -12,7 +12,7 @@
 /* v3 — switched from self-contained 5-7 MB partN.html pages to
    lightweight 39 KB shells + on-demand chunk loading.
    Cache key bumped so existing visitors discard the old cache.   */
-const CACHE_VERSION = 'asma-v4-2026-04-24';
+const CACHE_VERSION = 'asma-v5-2026-05-09-qareeb';
 
 /* Only precache the shell files — tiny and needed for every visit */
 const SHELL = [
@@ -57,11 +57,19 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.open(CACHE_VERSION).then(cache =>
       cache.match(req).then(cached => {
-        const network = fetch(req).then(res => {
+        const isContentRequest =
+          url.pathname.endsWith('.html') ||
+          url.pathname.includes('/chapters/');
+        const requestToFetch = isContentRequest
+          ? new Request(req, { cache: 'reload' })
+          : req;
+        const network = fetch(requestToFetch).then(res => {
           if (res && res.ok) cache.put(req, res.clone());
           return res;
         }).catch(() => cached);
-        /* Cache-first: serve instantly from cache, refresh in background */
+        /* Content is network-first so text updates reach returning visitors. */
+        if (isContentRequest) return network;
+        /* Static assets stay cache-first for fast repeat visits. */
         return cached || network;
       })
     )
